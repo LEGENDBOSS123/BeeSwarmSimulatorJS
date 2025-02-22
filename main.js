@@ -302,18 +302,16 @@ for (var i = 0; i < 0; i++) {
 let spaceBarPressed = false;
 
 document.addEventListener('keydown', function (event) {
-    if (event.code === 'Space' && !spaceBarPressed) {
+    if (event.code === 'KeyX' && !spaceBarPressed) {
         spaceBarPressed = true;
-        if (world.constraints.length == 0) {
-            return;
-        }
-        world.removeConstraint(world.constraints.at(-1))
+        player.moveStrength = new Vector3(0.05, 0, 0.05).scale(30);
     }
 });
 
 document.addEventListener('keyup', function (event) {
-    if (event.code === 'Space') {
+    if (event.code === 'KeyX') {
         spaceBarPressed = false;
+        player.moveStrength = new Vector3(0.05, 0, 0.05).scale(8);
     }
 });
 var fps = 20;
@@ -372,15 +370,27 @@ function render() {
         stats2.end();
 
 
-
+        if (player.canJump) {
+            player.composite.global.body.linearDamping.y = 0;
+        }
         if (cameraControls.movement.up && player.canJump) {
             var vel = player.composite.global.body.getVelocity();
             player.composite.global.body.setVelocity(new Vector3(vel.x, vel.y + player.jumpStrength * world.deltaTime, vel.z));
             player.canJump = false;
         }
-
+        else if (cameraControls.movement.up && cameraControls.justToggled.up) {
+            if (player.composite.global.body.linearDamping.y == 0) {
+                player.composite.global.body.linearDamping.y = 0.1;
+                player.composite.global.body.setVelocity(player.composite.global.body.getVelocity().multiply(new Vector3(1, 0, 1)));
+            }
+            else {
+                player.composite.global.body.linearDamping.y = 0;
+            }
+        }
         var delta2 = cameraControls.getDelta(graphicsEngine.camera);
-
+        if (delta2.magnitudeSquared() == 0 && player.composite.global.body.linearDamping.y != 0) {
+            delta2 = player.composite.global.body.rotation.multiplyVector3(new Vector3(0, 0, 1));
+        }
         cameraControls.reset();
         var delta3 = new Vector3(delta2.x, 0, delta2.z);
         delta3.normalizeInPlace();
