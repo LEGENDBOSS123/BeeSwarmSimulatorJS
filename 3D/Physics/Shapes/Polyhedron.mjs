@@ -27,8 +27,18 @@ var Polyhedron = class extends Composite {
             [2, 3, 7], [2, 7, 6], [0, 4, 7],
             [0, 7, 3], [1, 2, 6], [1, 6, 5],
         ];
+        this.isConvex = false;
         this.setLocalFlag(this.constructor.FLAGS.OCCUPIES_SPACE, true);
         this.dimensionsChanged();
+    }
+
+    dimensionsChanged() {
+        super.dimensionsChanged();
+        this.determineConcavity();
+    }
+
+    determineConcavity(){
+        this.isConvex = false;
     }
 
     calculateGlobalVertices() {

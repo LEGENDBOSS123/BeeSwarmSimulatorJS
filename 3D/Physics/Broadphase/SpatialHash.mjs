@@ -222,7 +222,7 @@ var SpatialHash = class {
     }
 
     static fromJSON(json, world) {
-        var spatialHash = new SpatialHash();
+        var spatialHash = new this();
         spatialHash.world = world;
         spatialHash.global = json.global;
         spatialHash.spatialHashes = json.spatialHashes;

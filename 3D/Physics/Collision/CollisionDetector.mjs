@@ -286,7 +286,7 @@ var CollisionDetector = class {
     }
 
     horizontalRayIntersectsTriangle(orig, a, b, c) {
-        var EPSILON = 1e-10;
+        var EPSILON = 1e-4;
         var edge1 = b.subtract(a);
         var edge2 = c.subtract(a);
         var aDot = - edge2.z * edge1.y + edge2.y * edge1.z;
@@ -301,6 +301,7 @@ var CollisionDetector = class {
         var t = f * edge2.dot(q);
         return t > EPSILON;
     }
+    
 
     handleSpherePolyhedron(sphere, poly) {
         var spherePos = null;
@@ -321,7 +322,7 @@ var CollisionDetector = class {
             closestNormal = null;
             minDistanceSquared = Infinity;
             inside = 0;
-            isInside = false;
+            isInside = poly.isConvex;
             var min = new Vector3();
             var max = new Vector3();
             var minS = relativePos.subtract(new Vector3(1, 1, 1).scale(sphere.radius));
@@ -339,26 +340,31 @@ var CollisionDetector = class {
                 min.z = Math.min(a.z, b.z, c.z);
                 max.z = Math.max(a.z, b.z, c.z);
 
-
-                if (this.horizontalRayIntersectsTriangle(relativePos, a, b, c)) {
+                var normal = b.subtract(a).cross(c.subtract(a)).normalize();
+                if (!poly.isConvex && this.horizontalRayIntersectsTriangle(relativePos, a, b, c)) {
                     inside++;
                 }
+                if (poly.isConvex && a.subtract(relativePos).dot(normal) < 0) {
+                    isInside = false;
+                }
+
 
                 if (!(min.x <= maxS.x && max.x >= minS.x && min.y <= maxS.y && max.y >= minS.y && min.z <= maxS.z && max.z >= minS.z)) {
                     if (!disableHitbox) {
                         continue;
                     }
                 }
+                
                 var closest = this.closestPointOnTriangle(relativePos, a, b, c);
                 var distSq = closest.subtract(relativePos).magnitudeSquared();
                 if (distSq < minDistanceSquared) {
                     minDistanceSquared = distSq;
                     closestPoint = closest;
-                    closestNormal = b.subtract(a).cross(c.subtract(a)).normalize();
+                    closestNormal = normal;
                 }
             }
             if (inside % 2 == 1) {
-                //isInside = true;
+                isInside = true;
                 if (closestPoint && closestPoint.subtract(relativePos).dot(closestNormal) < 0) {
                     isInside = false;
                 }
@@ -380,8 +386,9 @@ var CollisionDetector = class {
             }
         }
         t = maxT;
+        
         var bin = binarySearch(t, !Number.isFinite(minDistanceSquared));
-        if (bin > 0) {
+        if (bin > 0 || !closestPoint) {
             return false;
         }
 
@@ -398,11 +405,12 @@ var CollisionDetector = class {
 
         contact.penetration = contact.normal.scale(sphere.radius).add(contact.point.subtract(sphere.global.body.position).projectOnto(contact.normal));
         if (contact.penetration.magnitude() > 1) {
+            //top.stopped = true;
         }
         contact.body1 = sphere;
         contact.body2 = poly;
         contact.point = sphere.global.body.position.subtract(contact.normal.scale(sphere.radius));
-        //console.log(contact.body2);
+
         this.addContact(contact);
         return true;
 

@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(-100, 30, 300),
+                position: new Vector3(0, 30, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
@@ -167,6 +167,7 @@ function maxAxis(b) {
 function hasOver2000FacesOrVertices(mesh) {
     const geometry = mesh.geometry;
     var n = [0, 1000];
+    //return true
     const numFaces = geometry.attributes.position.count / 3;
     if (maxAxis(mesh.geometry.boundingBox) < 150 && mesh.material.map?.source?.data?.width != 1024) {
         return false;
@@ -192,7 +193,7 @@ for (var i = 0; i < 1; i++) {
             }
             if (child.isMesh && hasOver2000FacesOrVertices(child) && 1 == 1) {
                 var s = 0;
-                //child.scale.x = 20.1; child.scale.y = 20.1; child.scale.z = 20.1;
+                //child.scale.x = 30; child.scale.y = 30; child.scale.z = 30;
                 var poly = new Polyhedron({ local: { body: { mass: 1 } } }).fromMesh(child, graphicsEngine);
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
@@ -292,7 +293,7 @@ for (var i = 0; i < 0; i++) {
 // for(var i of poly.localVertices){
 //     i.scaleInPlace(30);
 // }
-// poly.setPosition(new Vector3(0, 0, 0));
+// poly.setPosition(new Vector3(0, 29, 0));
 // poly.dimensionsChanged();
 // poly.setMeshAndAddToScene({}, graphicsEngine);
 // poly.setLocalFlag(Composite.FLAGS.STATIC, true);
