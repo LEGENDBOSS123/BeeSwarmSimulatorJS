@@ -164,10 +164,11 @@ top.addParticle = addParticle;
 function maxAxis(b) {
     return Math.max((b.max.x - b.min.x),(b.max.y - b.min.y),(b.max.z - b.min.z));
 };
+
 function hasOver2000FacesOrVertices(mesh) {
     const geometry = mesh.geometry;
     var n = [0, 1000];
-    //return true
+    return true
     const numFaces = geometry.attributes.position.count / 3;
     if (maxAxis(mesh.geometry.boundingBox) < 150 && mesh.material.map?.source?.data?.width != 1024) {
         return false;
@@ -179,7 +180,7 @@ for (var i = 0; i < 1; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;
-    graphicsEngine.load('bss.glb', function (gltf) {
+    graphicsEngine.load('map.glb', function (gltf) {
         gltf.scene.castShadow = true;
         gltf.scene.receiveShadow = true;
         //graphicsEngine.scene.add(gltf.scene.children[0]);
@@ -188,7 +189,7 @@ for (var i = 0; i < 1; i++) {
             child.castShadow = true;
             child.receiveShadow = true;
             if (child.isMesh) {
-                child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
+                //child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
                 child.material.depthWrite = true;
             }
             if (child.isMesh && hasOver2000FacesOrVertices(child) && 1 == 1) {
@@ -198,24 +199,45 @@ for (var i = 0; i < 1; i++) {
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                poly.addToScene(graphicsEngine.scene);
+                //poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                //poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
                 // composite.add(poly);
                 //graphicsEngine.scene.add(child);
-                top.e = child;
-                child.geometry.computeVertexNormals();
+                // top.e = child;
+                // child.geometry.computeVertexNormals();
                 world.addComposite(poly);
                 top.poly = poly;
             }
             else if (child.isMesh) {
-                graphicsEngine.scene.add(child);
+                //graphicsEngine.scene.add(child);
             }
 
         });
         player.respawn();
+    });
+    // world.addComposite(composite);
+}
+for (var i = 0; i < 1; i++) {
+    // var composite = new Composite();
+    // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
+    // top.comp = composite;
+    graphicsEngine.load('bss.glb', function (gltf) {
+        gltf.scene.castShadow = true;
+        gltf.scene.receiveShadow = true;
+        graphicsEngine.scene.add(gltf.scene);
+        gltf.scene.traverse(function (child) {
+            // child = child.clone();
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (child.isMesh) {
+                //child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
+                child.material.depthWrite = true;
+            }
+
+        });
     });
     // world.addComposite(composite);
 }

@@ -2,7 +2,6 @@ import Vector3 from "../Math3D/Vector3.mjs";
 import Hitbox3 from "../Broadphase/Hitbox3.mjs";
 
 var SpatialHash = class {
-    static hashConstants = [4917, 2933, 9893, 1024];
     constructor(options) {
         this.world = options?.world ?? null;
         this.spatialHashes = [];
@@ -11,7 +10,7 @@ var SpatialHash = class {
             spatialHash.hashmap = new Map();
             spatialHash.gridSize = options?.gridSizes?.[i] ?? Math.pow(4, i) * 0.25;
             spatialHash.inverseGridSize = 1 / spatialHash.gridSize;
-            spatialHash.threshold = options?.thresholds?.[i] ?? 1;
+            spatialHash.threshold = options?.thresholds?.[i] ?? 4;
             spatialHash.translation = new Vector3();
             spatialHash.index = i;
             if(spatialHash.index % 2 == 0){
@@ -25,13 +24,13 @@ var SpatialHash = class {
             this.spatialHashes[i].final = false;
         }
         this.global = new Set();
-        this.spatialHashes.push({ final: true, hashmap: this.global, next: null, index: this.spatialHashes.length });
+        this.spatialHashes.push({ final: true, hashmap: this.global, next: null, index: this.spatialHashes.length});
         this.spatialHashes[this.spatialHashes.length - 2].next = this.spatialHashes[this.spatialHashes.length - 1];
         this.ids = {};
     }
 
-    hash(cellPos) {
-        return ((cellPos.x * this.constructor.hashConstants[0]) ^ (cellPos.y * this.constructor.hashConstants[1]) ^ (cellPos.z * this.constructor.hashConstants[2])) % this.constructor.hashConstants[3];
+    hash(v) {
+        return (((((2166136261 ^ Math.floor(v.x)) * 16777619) & 0xFFFFFFFF) ^ Math.floor(v.y)) * 16777619 & 0xFFFFFFFF ^ Math.floor(v.z)) * 16777619 & 0xFFFFFFFF >>> 0;
     }
 
     remove(id) {
@@ -92,9 +91,6 @@ var SpatialHash = class {
         }
         var min = this.getCellPosition(hitbox.min, hash);
         var max = this.getCellPosition(hitbox.max, hash);
-        if (this.getSizeHeuristic(min, max) > hash.threshold) {
-            return this._removeHitbox(hitbox, id, hash.next);
-        }
         var v = min.copy();
         for (v.x = min.x; v.x <= max.x; v.x++) {
             for (v.y = min.y; v.y <= max.y; v.y++) {
@@ -140,6 +136,7 @@ var SpatialHash = class {
     }
 
     _query(hitbox, result = new Set(), hash = this.spatialHashes[0], func) {
+
         if (hash.final) {
             if (hash.hashmap.size == 0) {
                 return result;

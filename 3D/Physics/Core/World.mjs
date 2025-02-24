@@ -1,7 +1,6 @@
 import SpatialHash from "../Broadphase/SpatialHash.mjs";
+import SweepAndPrune from "../Broadphase/SweepAndPrune.mjs";
 import CollisionDetector from "../Collision/CollisionDetector.mjs";
-import Constraint from "../Collision/Constraint.mjs";
-import Composite from "../Shapes/Composite.mjs";
 import ClassRegistry from "./ClassRegistry.mjs";
 
 var World = class {
@@ -15,8 +14,8 @@ var World = class {
 
         this.all = options?.all ?? {};
         this.constraints = options?.constraints ?? [];
-        this.composites = options?.composites?? [];
-        this.spatialHash = options?.spatialHash ?? new SpatialHash({ world: this });
+        this.composites = options?.composites ?? [];
+        this.spatialHash = options?.spatialHash ?? new SpatialHash({ world: this });//new SweepAndPrune({ world: this });
         this.collisionDetector = options?.collisionDetector ?? new CollisionDetector({ world: this });
         this.graphicsEngine = options?.graphicsEngine ?? null;
     }
@@ -37,7 +36,7 @@ var World = class {
         this.composites.push(composite);
     }
 
-    addConstraint(element){
+    addConstraint(element) {
         this.add(element);
         this.constraints.push(element);
     }
@@ -53,7 +52,7 @@ var World = class {
     }
 
     removeComposite(element, first = true) {
-        
+
         if (element.parent && first) {
             element.parent.children.splice(element.parent.children.indexOf(element), 1);
         }
@@ -61,17 +60,17 @@ var World = class {
         for (var i in element.children) {
             this.removeComposite(element.children[i], false);
         }
-        
+
         this.remove(element);
     }
 
-    removeConstraint(element){
+    removeConstraint(element) {
         this.constraints.splice(this.constraints.indexOf(element), 1);
         this.remove(element);
-    }   
+    }
 
 
-    remove(element){
+    remove(element) {
         element.dispatchEvent("delete");
         element.disposeMesh();
         this.graphicsEngine.meshLinker.removeMesh(element.id);
@@ -80,14 +79,14 @@ var World = class {
     }
 
     step() {
-        if(top.stopped) return;
+        if (top.stopped) return;
         for (var i in this.all) {
             this.all[i].dispatchEvent("preStep");
         }
         for (var iter = 0; iter < this.iterations; iter++) {
             for (var comp of this.composites) {
                 comp.dispatchEvent("preIteration");
-                
+
                 if (comp.isMaxParent()) {
                     comp.updateBeforeCollisionAll();
                 }
@@ -138,11 +137,11 @@ var World = class {
             world.all[i] = this.getByID(i).toJSON();
         }
 
-        for(var i in this.composites){
+        for (var i in this.composites) {
             world.composites[i] = this.composites[i].id;
         }
 
-        for(var i in this.constraints){
+        for (var i in this.constraints) {
             world.constraints[i] = this.constraints[i].id;
         }
 
@@ -172,15 +171,15 @@ var World = class {
             world.all[i].updateReferences(world, graphicsEngine);
         }
 
-        for(var i in json.constraints){
+        for (var i in json.constraints) {
             world.constraints[i] = world.getByID(json.constraints[i]);
         }
 
-        for(var i in json.composites){
+        for (var i in json.composites) {
             world.composites[i] = world.getByID(json.composites[i]);
         }
 
-        world.spatialHash = new SpatialHash({ world: world });
+        world.spatialHash = new SpatialHash({ world: world });//new SweepAndPrune({ world: world });
         world.collisionDetector = CollisionDetector.fromJSON(json.collisionDetector, world);
         world.graphicsEngine = graphicsEngine;
         return world;

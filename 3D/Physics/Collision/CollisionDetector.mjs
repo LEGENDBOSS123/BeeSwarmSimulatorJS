@@ -1,9 +1,9 @@
 import Vector3 from "../Math3D/Vector3.mjs";
-import DistanceConstraint from "./DistanceConstraint.mjs";
 import CollisionContact from "./CollisionContact.mjs";
 import Triangle from "../Shapes/Triangle.mjs";
 import Composite from "../Shapes/Composite.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
+
 var CollisionDetector = class {
 
     static seperatorCharacter = ":";
@@ -85,9 +85,17 @@ var CollisionDetector = class {
     }
 
     handleAll(shapes) {
+        // var func = function (a, b) {
+        //     this.addPair(this.world.getByID(a), this.world.getByID(b));
+        //     return false;
+        // }.bind(this);
+        // this.world.spatialHash.findAllPairs(func);
+
+        // return;
+        this.pairs.clear();
         for (var i in shapes) {
             if (shapes[i].getLocalFlag(Composite.FLAGS.STATIC)) {
-                continue;
+                //continue;
             }
             this.handle(shapes[i]);
         }
@@ -99,7 +107,7 @@ var CollisionDetector = class {
             this.detectCollision(value[0], value[1]);
         }
         this.resolveAllContacts();
-        this.pairs.clear();
+        
     }
 
     broadphase(shape1, shape2) {
