@@ -55,9 +55,9 @@ graphicsEngine.setBackgroundImage("3D/Graphics/Textures/autumn_field_puresky_8k.
 graphicsEngine.setSunlightDirection(new Vector3(-2, -8, -5));
 graphicsEngine.setSunlightBrightness(1);
 graphicsEngine.disableAO();
-graphicsEngine.disableShadows();
+// graphicsEngine.disableShadows();
 
-graphicsEngine.renderDistance = 2048;
+graphicsEngine.renderDistance = 1024;
 graphicsEngine.cameraFar = 4096;
 window.graphicsEngine = graphicsEngine;
 
@@ -116,7 +116,7 @@ for (var i = 0; i < 1; i++) {
     var player = new Player({
         radius: 2.5,
         moveStrength: new Vector3(0.05, 0, 0.05).scale(8),
-        jumpStrength: 4,
+        jumpStrength: 3.95,
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
@@ -183,7 +183,7 @@ for (var i = 0; i < 1; i++) {
     graphicsEngine.load('map.glb', function (gltf) {
         gltf.scene.castShadow = true;
         gltf.scene.receiveShadow = true;
-        //graphicsEngine.scene.add(gltf.scene.children[0]);
+        //graphicsEngine.scene.add(gltf.scene);
         gltf.scene.traverse(function (child) {
             child = child.clone();
             child.castShadow = true;
@@ -199,8 +199,8 @@ for (var i = 0; i < 1; i++) {
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                //poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                //poly.addToScene(graphicsEngine.scene);
+                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
@@ -220,7 +220,7 @@ for (var i = 0; i < 1; i++) {
     });
     // world.addComposite(composite);
 }
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 0; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;

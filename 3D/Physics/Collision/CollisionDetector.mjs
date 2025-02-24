@@ -362,6 +362,7 @@ var CollisionDetector = class {
                         continue;
                     }
                 }
+               
                 
                 var closest = this.closestPointOnTriangle(relativePos, a, b, c);
                 var distSq = closest.subtract(relativePos).magnitudeSquared();
