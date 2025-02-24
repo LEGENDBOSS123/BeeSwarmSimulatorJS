@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 30, 0),
+                position: new Vector3(0, 1000, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }

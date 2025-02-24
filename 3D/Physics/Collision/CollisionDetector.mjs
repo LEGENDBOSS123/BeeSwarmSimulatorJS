@@ -150,10 +150,6 @@ var CollisionDetector = class {
                 var b = contact.body2.maxParent;
                 var a_body = a.global.body;
                 var b_body = b.global.body;
-                // a_body.netForce.reset();
-                // b_body.netForce.reset();
-                // a_body.netTorque.reset();
-                // b_body.netTorque.reset();
                 contact.applyForces();
                 a_body.setVelocity(a_body.getVelocity().add(a_body.netForce.scale(a_body.inverseMass).multiply(new Vector3(1 - a_body.linearDamping.x, 1 - a_body.linearDamping.y, 1 - a_body.linearDamping.z))));
                 b_body.setVelocity(b_body.getVelocity().add(b_body.netForce.scale(b_body.inverseMass).multiply(new Vector3(1 - b_body.linearDamping.x, 1 - b_body.linearDamping.y, 1 - b_body.linearDamping.z))));
