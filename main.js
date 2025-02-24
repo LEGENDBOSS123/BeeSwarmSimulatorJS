@@ -220,7 +220,7 @@ for (var i = 0; i < 1; i++) {
     });
     // world.addComposite(composite);
 }
-for (var i = 0; i < 0; i++) {
+for (var i = 0; i < 1; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;
