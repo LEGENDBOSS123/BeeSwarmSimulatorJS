@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 1000, 0),
+                position: new Vector3(0, 30, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
@@ -199,8 +199,8 @@ for (var i = 0; i < 1; i++) {
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                poly.addToScene(graphicsEngine.scene);
+                // poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                // poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
@@ -403,12 +403,19 @@ function render() {
         }
         else if (cameraControls.movement.up && cameraControls.justToggled.up) {
             if (player.composite.global.body.linearDamping.y == 0) {
-                player.composite.global.body.linearDamping.y = 0.1;
+                player.composite.global.body.linearDamping.y = 0.00000001;
                 player.composite.global.body.setVelocity(player.composite.global.body.getVelocity().multiply(new Vector3(1, 0, 1)));
             }
             else {
                 player.composite.global.body.linearDamping.y = 0;
             }
+        }
+        if(player.composite.global.body.linearDamping.y != 0) {
+            var vel = player.composite.global.body.getVelocity();
+            
+            vel.normalizeInPlace().scaleInPlace(0.7);
+            vel.y = -0.175;
+            player.composite.global.body.setVelocity(vel);
         }
         var delta2 = cameraControls.getDelta(graphicsEngine.camera);
         if (delta2.magnitudeSquared() == 0 && player.composite.global.body.linearDamping.y != 0) {
@@ -419,7 +426,7 @@ function render() {
         delta3.normalizeInPlace();
         delta3.y = delta2.y;
         delta3.scaleInPlace(player.composite.global.body.mass * world.deltaTime).multiplyInPlace(player.moveStrength);
-        player.composite.applyForce(delta3, player.composite.global.body.position);
+        player.composite.applyForce(delta3);
 
     }
 
