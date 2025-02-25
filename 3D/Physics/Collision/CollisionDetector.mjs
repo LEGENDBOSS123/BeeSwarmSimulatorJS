@@ -82,6 +82,10 @@ var CollisionDetector = class {
             return false;
         }.bind(this);
         this.world.spatialHash.query(shape.id, func);
+        // var pairs = this.world.spatialHash.query(shape.id);
+        // for(var pair of pairs){
+        //     this.addPair(shape, this.world.getByID(pair));
+        // }
     }
 
     handleAll(shapes) {
@@ -95,7 +99,7 @@ var CollisionDetector = class {
         this.pairs.clear();
         for (var i in shapes) {
             if (shapes[i].getLocalFlag(Composite.FLAGS.STATIC)) {
-                //continue;
+                continue;
             }
             this.handle(shapes[i]);
         }

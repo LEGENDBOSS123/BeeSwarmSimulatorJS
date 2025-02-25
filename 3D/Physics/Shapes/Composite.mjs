@@ -31,7 +31,7 @@ var Composite = class extends WorldObject {
 
         this.global = {};
         this.global.body = new PhysicsBody3(options?.global?.body);
-        this.global.hitbox = new Hitbox3(options?.global?.hitbox);
+        this.global.hitbox = Hitbox3.from(options?.global?.hitbox);
         this.global.flags = options?.global?.flags ?? 0;
 
         this.local = {};
@@ -39,7 +39,7 @@ var Composite = class extends WorldObject {
         this.local.flags = options?.local?.flags ?? 0;
         this.setLocalFlag(this.constructor.FLAGS.OCCUPIES_SPACE, false);
         this.isSensor = options?.isSensor ?? false;
-        this.local.hitbox = new Hitbox3(options?.local?.hitbox);
+        this.local.hitbox = Hitbox3.from(options?.local?.hitbox);
 
     }
 

@@ -38,9 +38,6 @@ var SweepAndPrune = class {
                 arr[writeIndex] = arr[readIndex];
                 writeIndex++;
             }
-            else{
-                console.log(arr[readIndex])
-            }
         }
         arr.length = writeIndex;
         return arr;

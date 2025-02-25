@@ -1,7 +1,10 @@
 import SpatialHash from "../Broadphase/SpatialHash.mjs";
 import SweepAndPrune from "../Broadphase/SweepAndPrune.mjs";
+import Octree from "../Broadphase/Octree.mjs";
 import CollisionDetector from "../Collision/CollisionDetector.mjs";
 import ClassRegistry from "./ClassRegistry.mjs";
+
+
 
 var World = class {
     constructor(options) {
@@ -15,7 +18,8 @@ var World = class {
         this.all = options?.all ?? {};
         this.constraints = options?.constraints ?? [];
         this.composites = options?.composites ?? [];
-        this.spatialHash = options?.spatialHash ?? new SpatialHash({ world: this });//new SweepAndPrune({ world: this });
+        this.broadphase = options?.broadphase ?? Octree;
+        this.spatialHash = options?.spatialHash ?? new this.broadphase({ world: this });
         this.collisionDetector = options?.collisionDetector ?? new CollisionDetector({ world: this });
         this.graphicsEngine = options?.graphicsEngine ?? null;
     }
@@ -179,7 +183,7 @@ var World = class {
             world.composites[i] = world.getByID(json.composites[i]);
         }
 
-        world.spatialHash = new SpatialHash({ world: world });//new SweepAndPrune({ world: world });
+        world.spatialHash = new this.broadphase({ world: world });
         world.collisionDetector = CollisionDetector.fromJSON(json.collisionDetector, world);
         world.graphicsEngine = graphicsEngine;
         return world;

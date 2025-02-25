@@ -1,9 +1,9 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 
 var Hitbox3 = class {
-    constructor(options) {
-        this.min = options?.min ?? new Vector3();
-        this.max = options?.max ?? new Vector3();
+    constructor(min = new Vector3(), max = new Vector3()) {
+        this.min = min;
+        this.max = max;
     }
 
     copy() {
@@ -75,7 +75,7 @@ var Hitbox3 = class {
     }
 
     contains(h2) {
-        if (this.min.x >= h2.min.x && this.min.y >= h2.min.y && this.max.x <= h2.max.x && this.max.y <= h2.max.y && this.min.z >= h2.min.z && this.max.z <= h2.max.z) {
+        if (h2.min.x >= this.min.x && h2.min.y >= this.min.y && h2.max.x <= this.max.x && h2.max.y <= this.max.y && h2.min.z >= this.min.z && h2.max.z <= this.max.z) {
             return true;
         }
         return false;

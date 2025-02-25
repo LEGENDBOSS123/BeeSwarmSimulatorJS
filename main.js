@@ -112,7 +112,7 @@ world.setIterations(4);
 world.graphicsEngine = graphicsEngine;
 
 var gravity = -0.8;
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 20; i++) {
     var player = new Player({
         radius: 2.5,
         moveStrength: new Vector3(0.05, 0, 0.05).scale(8),
@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 30, 0),
+                position: new Vector3(0, 300, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
