@@ -18,14 +18,6 @@ var CollisionDetector = class {
         this.initHandlers();
     }
 
-    inPairs(shape1, shape2) {
-        if (shape1.id > shape2.id) {
-            return this.pairs.has(shape2.id + this.constructor.seperatorCharacter + shape1.id);
-        }
-
-        return this.pairs.has(shape1.id + this.constructor.seperatorCharacter + shape2.id);
-    }
-
     addContact(contact) {
         this.contacts.push(contact);
     }
@@ -43,7 +35,7 @@ var CollisionDetector = class {
             shape1 = shape2;
             shape2 = temp;
         }
-        if (!(this.handlers[shape1.type]?.[shape2.type] || this.handlers[shape2.type]?.[shape1.type])) {
+        if (this.pairs.has(shape1.id + this.constructor.seperatorCharacter + shape2.id) || !(this.handlers[shape1.type]?.[shape2.type] || this.handlers[shape2.type]?.[shape1.type])) {
             return;
         }
         return this.pairs.set(shape1.id + this.constructor.seperatorCharacter + shape2.id, [shape1, shape2]);

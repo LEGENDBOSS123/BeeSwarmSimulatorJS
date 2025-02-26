@@ -5,7 +5,7 @@ var SpatialHash = class {
     constructor(options) {
         this.world = options?.world ?? null;
         this.spatialHashes = [];
-        for (var i = 0; i < (options?.gridSizes?.length ?? 8); i++) {
+        for (var i = 0; i < (options?.gridSizes?.length ?? 12); i++) {
             var spatialHash = {};
             spatialHash.hashmap = new Map();
             spatialHash.gridSize = options?.gridSizes?.[i] ?? Math.pow(4, i) * 0.25;
@@ -13,10 +13,10 @@ var SpatialHash = class {
             spatialHash.threshold = options?.thresholds?.[i] ?? 4;
             spatialHash.translation = new Vector3();
             spatialHash.index = i;
-            if(spatialHash.index % 2 == 0){
+            if (spatialHash.index % 2 == 0) {
                 spatialHash.translation = new Vector3(spatialHash.gridSize * 0.5, spatialHash.gridSize * 0.5, spatialHash.gridSize * 0.5);
             }
-            
+
             this.spatialHashes.push(spatialHash);
         }
         for (var i = 0; i < this.spatialHashes.length - 1; i++) {
@@ -24,7 +24,7 @@ var SpatialHash = class {
             this.spatialHashes[i].final = false;
         }
         this.global = new Set();
-        this.spatialHashes.push({ final: true, hashmap: this.global, next: null, index: this.spatialHashes.length});
+        this.spatialHashes.push({ final: true, hashmap: this.global, next: null, index: this.spatialHashes.length });
         this.spatialHashes[this.spatialHashes.length - 2].next = this.spatialHashes[this.spatialHashes.length - 1];
         this.ids = {};
     }
@@ -47,7 +47,7 @@ var SpatialHash = class {
         return (max.x - min.x + 1) * (max.y - min.y + 1) * (max.z - min.z + 1);
     }
 
-    _addHitbox(hitbox, id, hash = this.spatialHashes[0]) {
+    _addHitbox(hitbox, id, hash = this.spatialHashes[0], below = false) {
 
         if (hash.final) {
             hash.hashmap.add(id);
@@ -57,18 +57,23 @@ var SpatialHash = class {
 
         var min = this.getCellPosition(hitbox.min, hash);
         var max = this.getCellPosition(hitbox.max, hash);
-        if (this.getSizeHeuristic(min, max) > hash.threshold) {
-            return this._addHitbox(hitbox, id, hash.next);
+        if (!below) {
+            if (this.getSizeHeuristic(min, max) > hash.threshold) {
+                return this._addHitbox(hitbox, id, hash.next);
+            }
+            this.ids[id].hash = hash;
         }
-        this.ids[id].hash = hash;
         var v = min.copy();
         for (v.x = min.x; v.x <= max.x; v.x++) {
             for (v.y = min.y; v.y <= max.y; v.y++) {
                 for (v.z = min.z; v.z <= max.z; v.z++) {
                     var cell = this.hash(v);
-                    this.addToCell(cell, id, hash);
+                    this.addToCell(cell, id, hash, below);
                 }
             }
+        }
+        if (!hash.next.final) {
+            return this._addHitbox(hitbox, id, hash.next, true)
         }
     }
 
@@ -84,7 +89,7 @@ var SpatialHash = class {
         this._addHitbox(hitbox, id, this.spatialHashes[0]);
     }
 
-    _removeHitbox(hitbox, id, hash = this.spatialHashes[0]) {
+    _removeHitbox(hitbox, id, hash = this.spatialHashes[0], below = false) {
         if (hash.final) {
             hash.hashmap.delete(id);
             return true;
@@ -96,9 +101,12 @@ var SpatialHash = class {
             for (v.y = min.y; v.y <= max.y; v.y++) {
                 for (v.z = min.z; v.z <= max.z; v.z++) {
                     var cell = this.hash(v);
-                    this.removeFromCell(cell, id, hash);
+                    this.removeFromCell(cell, id, hash, below);
                 }
             }
+        }
+        if (!hash.next.final) {
+            this._removeHitbox(hitbox, id, hash.next, true)
         }
     }
 
@@ -109,43 +117,62 @@ var SpatialHash = class {
         this._removeHitbox(this.ids[id].hitbox, id, this.ids[id].hash);
     }
 
-    removeFromCell(cell, id, hash) {
+    removeFromCell(cell, id, hash, below = false) {
         var map = hash.hashmap.get(cell);
         if (!map) {
             return false;
         }
-        var index = map.indexOf(id);
+        var arr = map.array;
+        var arr2 = map.below;
+        if (below) {
+            arr = map.below;
+            arr2 = map.array;
+        }
+        
+        var index = arr.indexOf(id);
         if (index == -1) {
             return false;
         }
-        map.splice(index, 1);
-        if (map.length == 0) {
+        arr.splice(index, 1);
+        if (arr.length == 0 && arr2.length == 0) {
             hash.hashmap.delete(cell);
         }
         return true;
     }
 
-    addToCell(cell, id, hash) {
+    addToCell(cell, id, hash, below = false) {
         var map = hash.hashmap.get(cell);
         if (!map) {
-            map = [];
+            map = { array: [], below: [] };
             hash.hashmap.set(cell, map);
         }
-        map.push(id);
+        if (below) {
+            map.below.push(id);
+            return true;
+        }
+        map.array.push(id);
         return true;
     }
 
-    _query(hitbox, result = new Set(), hash = this.spatialHashes[0], func) {
+    _query(hitbox, result = new Set(), hash = this.spatialHashes[0], func, first = false) {
 
         if (hash.final) {
             if (hash.hashmap.size == 0) {
                 return result;
             }
             for (var i of hash.hashmap) {
-                if(!func(i)){
+                if (!func(i)) {
                     continue;
                 }
                 result.add(i);
+            }
+            if (first) {
+                for (var i in this.ids) {
+                    if (!func(i)) {
+                        continue;
+                    }
+                    result.add(i);
+                }
             }
             return [...(new Set(result))];
         }
@@ -161,11 +188,21 @@ var SpatialHash = class {
                         cell = this.hash(v);
                         map = hash.hashmap.get(cell);
                         if (map) {
-                            for (var i = 0; i < map.length; i++) {
-                                if(!func(map[i])){
+                           
+                            for (var i of map.array) {
+                                if (!func(i)) {
                                     continue;
                                 }
-                                result.add(map[i]);
+                                result.add(i);
+                            }
+                            if (first) {
+                                for (var i of map.below) {
+                                    
+                                    if (!func(i)) {
+                                        continue;
+                                    }
+                                    result.add(i);
+                                }
                             }
                         }
                     }
@@ -179,10 +216,10 @@ var SpatialHash = class {
         if (!this.ids[id]) {
             return [];
         }
-        if(!func){
-            func = function(x){return true}
+        if (!func) {
+            func = function (x) { return true }
         }
-        return this._query(this.ids[id].hitbox, new Set(), this.ids[id].hash, func);
+        return this._query(this.ids[id].hitbox, new Set(), this.ids[id].hash, func, true);
     }
 
     toJSON() {

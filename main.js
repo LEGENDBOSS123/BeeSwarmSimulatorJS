@@ -112,7 +112,7 @@ world.setIterations(4);
 world.graphicsEngine = graphicsEngine;
 
 var gravity = -0.8;
-for (var i = 0; i < 20; i++) {
+for (var i = 0; i < 1; i++) {
     var player = new Player({
         radius: 2.5,
         moveStrength: new Vector3(0.05, 0, 0.05).scale(8),
@@ -120,7 +120,7 @@ for (var i = 0; i < 20; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 300, 0),
+                position: new Vector3(0, 200, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
@@ -167,11 +167,11 @@ function maxAxis(b) {
 
 function hasOver2000FacesOrVertices(mesh) {
     const geometry = mesh.geometry;
-    var n = [0, 1000];
-    return true
+    var n = [0, 100];
+    //return true
     const numFaces = geometry.attributes.position.count / 3;
     if (maxAxis(mesh.geometry.boundingBox) < 150 && mesh.material.map?.source?.data?.width != 1024) {
-        return false;
+        //return false;
     }
     return numFaces > n[0] && numFaces < n[1];
 }
@@ -199,8 +199,8 @@ for (var i = 0; i < 1; i++) {
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                // poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                // poly.addToScene(graphicsEngine.scene);
+                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
