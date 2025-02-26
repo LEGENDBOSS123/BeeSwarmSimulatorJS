@@ -400,11 +400,7 @@ var Composite = class extends WorldObject {
         if (this.isMaxParent()) {
             this.calculatePropertiesAll();
             this.syncAll();
-        }
-        
-        this.updateGlobalHitboxAll();
-
-        if (this.isMaxParent()) {
+            this.updateGlobalHitboxAll();
             this.updateMaxParentMomentOfInertia();
         }
     }

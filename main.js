@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 200, 0),
+                position: new Vector3(0, 50, 0),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
@@ -177,9 +177,6 @@ function hasOver2000FacesOrVertices(mesh) {
 }
 
 for (var i = 0; i < 1; i++) {
-    // var composite = new Composite();
-    // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
-    // top.comp = composite;
     graphicsEngine.load('map.glb', function (gltf) {
         gltf.scene.castShadow = true;
         gltf.scene.receiveShadow = true;
@@ -218,9 +215,8 @@ for (var i = 0; i < 1; i++) {
         });
         player.respawn();
     });
-    // world.addComposite(composite);
 }
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 0; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;
