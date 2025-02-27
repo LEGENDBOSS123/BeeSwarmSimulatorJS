@@ -13,7 +13,7 @@ import Point from "./3D/Physics/Shapes/Point.mjs";
 import Terrain3 from "./3D/Physics/Shapes/Terrain3.mjs";
 import SpatialHash from "./3D/Physics/Broadphase/SpatialHash.mjs";
 import World from "./3D/Physics/Core/World.mjs";
-import Contact from "./3D/Physics/Collision/Contact.mjs";
+import CollisionContact from "./3D/Physics/Collision/CollisionContact.mjs";
 import CollisionDetector from "./3D/Physics/Collision/CollisionDetector.mjs";
 import SimpleCameraControls from "./3D/SimpleCameraControls.mjs";
 import CameraTHREEJS from "./3D/CameraTHREEJS.mjs";
@@ -55,7 +55,7 @@ graphicsEngine.setBackgroundImage("3D/Graphics/Textures/autumn_field_puresky_8k.
 graphicsEngine.setSunlightDirection(new Vector3(-2, -8, -5));
 graphicsEngine.setSunlightBrightness(1);
 graphicsEngine.disableAO();
-// graphicsEngine.disableShadows();
+graphicsEngine.disableShadows();
 
 graphicsEngine.renderDistance = 1024;
 graphicsEngine.cameraFar = 4096;
@@ -108,7 +108,7 @@ var entitySystem = new EntitySystem();
 top.world = world;
 top.entitySystem = entitySystem;
 
-world.setIterations(4);
+world.setSubsteps(4);
 world.graphicsEngine = graphicsEngine;
 
 var gravity = -0.8;
@@ -120,7 +120,7 @@ for (var i = 0; i < 1; i++) {
         global: {
             body: {
                 acceleration: new Vector3(0, gravity, 0),
-                position: new Vector3(0, 50, 0),
+                position: new Vector3(Math.random() * 40, 500, Math.random() * 40),
                 linearDamping: new Vector3(0.04, 0, 0.04),
                 angularDamping: 1
             }
@@ -167,11 +167,11 @@ function maxAxis(b) {
 
 function hasOver2000FacesOrVertices(mesh) {
     const geometry = mesh.geometry;
-    var n = [0, 2000];
+    var n = [0, 1100];
     return true
     const numFaces = geometry.attributes.position.count / 3;
-    if (maxAxis(mesh.geometry.boundingBox) < 150 && mesh.material.map?.source?.data?.width != 1024) {
-        //return false;
+    if (maxAxis(mesh.geometry.boundingBox) < 450 && mesh.material.map?.source?.data?.width != 1024) {
+        return false;
     }
     return numFaces > n[0] && numFaces < n[1];
 }
@@ -186,7 +186,7 @@ for (var i = 0; i < 1; i++) {
             child.castShadow = true;
             child.receiveShadow = true;
             if (child.isMesh) {
-                //child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
+                // child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
                 child.material.depthWrite = true;
             }
             if (child.isMesh && hasOver2000FacesOrVertices(child) && 1 == 1) {
@@ -216,7 +216,7 @@ for (var i = 0; i < 1; i++) {
         player.respawn();
     });
 }
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 0; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;

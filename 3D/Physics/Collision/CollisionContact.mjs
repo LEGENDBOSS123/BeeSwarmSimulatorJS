@@ -18,6 +18,11 @@ var CollisionContact = class {
         this.body1Map = options?.body1Map;
         this.body2Map = options?.body2Map;
 
+        this.body1_netForce = new Vector3();
+        this.body2_netForce = new Vector3();
+        this.body1_netTorque = new Vector3();
+        this.body2_netTorque = new Vector3();
+
         this.material = options?.combinedMaterial;
 
         this.denominator = 0;
@@ -28,12 +33,12 @@ var CollisionContact = class {
     solve() {
         this.velocity = this.body1.getVelocityAtPosition(this.point).subtractInPlace(this.body2.getVelocityAtPosition(this.point));
         var impactSpeed = this.velocity.dot(this.normal);
-        if(impactSpeed > 0){
+        if (impactSpeed > 0) {
             return false;
         }
         var tangential = this.velocity.projectOntoPlane(this.normal);
         var tangentialNorm = tangential.normalize();
-        if(!this.solved){
+        if (!this.solved) {
             var radius1 = this.point.subtract(this.body1.maxParent.global.body.position);
             var radius2 = this.point.subtract(this.body2.maxParent.global.body.position);
 
@@ -42,8 +47,8 @@ var CollisionContact = class {
             rotationalEffects1 = isFinite(rotationalEffects1) ? rotationalEffects1 : 0;
             rotationalEffects2 = isFinite(rotationalEffects2) ? rotationalEffects2 : 0;
 
-            
-            
+
+
             var rotationalEffects1Fric = tangentialNorm.dot(this.body1.maxParent.global.body.inverseMomentOfInertia.multiplyVector3(radius1.cross(tangentialNorm)).cross(radius1));
             var rotationalEffects2Fric = tangentialNorm.dot(this.body2.maxParent.global.body.inverseMomentOfInertia.multiplyVector3(radius2.cross(tangentialNorm)).cross(radius2));
             rotationalEffects1Fric = isFinite(rotationalEffects1Fric) ? rotationalEffects1Fric : 0;
@@ -87,9 +92,25 @@ var CollisionContact = class {
         return true;
     }
 
-    applyForces(){
-        this.body1.maxParent.applyForce(this.impulse, this.point);
-        this.body2.maxParent.applyForce(this.impulse.scale(-1), this.point);
+    applyForces() {
+        var f1 = this.body1.maxParent.getForceEffect(this.impulse, this.point);
+        var f2 = this.body2.maxParent.getForceEffect(this.impulse.scale(-1), this.point);
+        if (f1) {
+            this.body1_netForce = f1[0];
+            this.body1_netTorque = f1[1];
+        }
+        else {
+            this.body1_netForce.reset();
+            this.body1_netTorque.reset();
+        }
+        if (f2) {
+            this.body2_netForce = f2[0]
+            this.body2_netTorque = f2[1];
+        }
+        else {
+            this.body2_netForce.reset();
+            this.body2_netTorque.reset();
+        }
     }
 
     copy() {

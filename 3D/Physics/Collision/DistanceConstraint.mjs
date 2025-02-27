@@ -12,6 +12,11 @@ var DistanceConstraint = class extends Constraint {
         this.body1 = options?.body1 ?? null;
         this.body2 = options?.body2 ?? null;
 
+        this.body1_netForce = new Vector3();
+        this.body2_netForce = new Vector3();
+        this.body1_netTorque = new Vector3();
+        this.body2_netTorque = new Vector3();
+
         this.point1 = options?.point1 ?? new Vector3();
         this.point2 = options?.point2 ?? new Vector3();
 
@@ -41,7 +46,7 @@ var DistanceConstraint = class extends Constraint {
             return null;
         }
         var lastPoints = [Vector3.fromJSON(last.body1.global.body.position).add(Quaternion.fromJSON(last.body1.global.body.rotation).multiplyVector3(last.anchor1)),
-            Vector3.fromJSON(last.body2.global.body.position).add(Quaternion.fromJSON(last.body2.global.body.rotation).multiplyVector3(last.anchor2))
+        Vector3.fromJSON(last.body2.global.body.position).add(Quaternion.fromJSON(last.body2.global.body.rotation).multiplyVector3(last.anchor2))
         ]
         var points = this.getPoints();
         var lerped = [
@@ -120,8 +125,16 @@ var DistanceConstraint = class extends Constraint {
     }
 
     applyForces() {
-        this.body1.maxParent.applyForce(this.impulse, this.point1);
-        this.body2.maxParent.applyForce(this.impulse.scale(-1), this.point2);
+        var f1 = this.body1.maxParent.getForceEffect(this.impulse, this.point);
+        var f2 = this.body2.maxParent.getForceEffect(this.impulse.scale(-1), this.point);
+        if (f1) {
+            this.body1_netForce = f1[0]
+            this.body1_netTorque = f1[1];
+        }
+        if (f2) {
+            this.body2_netForce = f2[0]
+            this.body2_netTorque = f2[1];
+        }
     }
 
     copy() {

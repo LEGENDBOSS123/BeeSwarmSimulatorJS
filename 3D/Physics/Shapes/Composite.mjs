@@ -40,7 +40,9 @@ var Composite = class extends WorldObject {
         this.setLocalFlag(this.constructor.FLAGS.OCCUPIES_SPACE, false);
         this.isSensor = options?.isSensor ?? false;
         this.local.hitbox = Hitbox3.from(options?.local?.hitbox);
-
+        this.sleeping = options?.sleeping ?? false;
+        this.sleepThreshold = options?.sleepThreshold ?? 16;
+        this.sleepCounter = options?.sleepCounter ?? 0;
     }
 
 
@@ -136,7 +138,8 @@ var Composite = class extends WorldObject {
         return this.global.body.momentOfInertia;
     }
 
-    dimensionsChanged(){
+    dimensionsChanged() {
+        this.awaken();
         this.calculateLocalHitbox();
         this.calculateGlobalHitbox(true);
         this.calculateLocalMomentOfInertia();
@@ -253,11 +256,25 @@ var Composite = class extends WorldObject {
         return this.global.body.getVelocityAtPosition(position);
     }
 
-    applyForce(force, position) {
-        if (!position) {
-            position = this.global.body.position;
+    getForceEffect(force, position = this.global.body.position) {
+        if (force.magnitudeSquared() == 0) {
+            return null;
         }
         if (this.isMaxParent()) {
+            if (this.getGlobalFlag(this.constructor.FLAGS.KINEMATIC | this.constructor.FLAGS.STATIC)) {
+                return null;
+            }
+            return [force, (position.subtract(this.global.body.position)).cross(force)];
+        }
+        return this.maxParent.getForceEffects(force, position);
+    }
+
+    applyForce(force, position = this.global.body.position) {
+        if (force.magnitudeSquared() == 0) {
+            return;
+        }
+        if (this.isMaxParent()) {
+            this.awaken();
             if (this.getGlobalFlag(this.constructor.FLAGS.KINEMATIC | this.constructor.FLAGS.STATIC)) {
                 return;
             }
@@ -325,6 +342,7 @@ var Composite = class extends WorldObject {
             this.global.flags = this.parent.global.flags | this.local.flags;
 
             this.global.body.rotation.set(this.parent.global.body.rotation.multiply(this.local.body.rotation));
+
             this.global.body.position.set(this.parent.global.body.position.add(this.parent.global.body.rotation.multiplyVector3(this.local.body.position)));
             this.global.body.setVelocity(this.parent.global.body.getVelocity().addInPlace(this.parent.global.body.getAngularVelocity().cross(this.global.body.position.subtract(this.parent.global.body.position))));
 
@@ -384,6 +402,8 @@ var Composite = class extends WorldObject {
     update() {
         if (!this.isMaxParent()) {
             this.local.body.update(this.world);
+            this.global.body.actualPreviousPosition.set(this.global.body.position);
+            this.global.body.previousRotation.set(this.global.body.rotation);
             return;
         }
         this.global.body.update(this.world);
@@ -394,7 +414,7 @@ var Composite = class extends WorldObject {
         for (var i = 0; i < this.children.length; i++) {
             this.children[i].updateBeforeCollisionAll();
         }
-        
+
         this.update();
 
         if (this.isMaxParent()) {
@@ -405,11 +425,48 @@ var Composite = class extends WorldObject {
         }
     }
 
+    updateSleepAll() {
+        var cannotSleep = false;
+        for (var child of this.children) {
+            child.updateSleepAll();
+            if (!child.sleeping) {
+                cannotSleep = true;
+            }
+        }
+        if (cannotSleep) {
+            this.awaken();
+            return;
+        }
+
+        if (this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999) {
+            return this.getSleepy();
+        }
+
+        return this.awaken();
+    }
+
     updateAfterCollisionAll() {
         if (this.isMaxParent()) {
             this.syncAll();
+            this.updateSleepAll();
         }
+    }
 
+    awaken() {
+        this.sleeping = false;
+        this.sleepCounter = 0;
+    }
+
+    getSleepy() {
+        this.sleepCounter++;
+        if (this.sleepCounter >= this.sleepThreshold) {
+            this.sleep();
+        }
+    }
+
+    sleep() {
+        this.sleeping = true;
+        this.sleepCounter = this.sleepThreshold;
     }
 
     translateChildren(v) {
@@ -426,8 +483,8 @@ var Composite = class extends WorldObject {
         }
     }
 
-    lerpMesh(last, lerp, previousWorld){
-        if(!this.mesh){
+    lerpMesh(last, lerp, previousWorld) {
+        if (!this.mesh) {
             return;
         }
         this.mesh.mesh.position.set(...this.global.body.position.lerp(last.global.body.position, 1 - lerp));
@@ -456,6 +513,9 @@ var Composite = class extends WorldObject {
         composite.local.body = this.local.body.toJSON();
         composite.local.hitbox = this.local.hitbox.toJSON();
         composite.local.flags = this.local.flags;
+        composite.sleeping = this.sleeping;
+        composite.sleepThreshold = this.sleepThreshold;
+        composite.sleepCounter = this.sleepCounter;
         return composite;
     }
 
@@ -478,6 +538,9 @@ var Composite = class extends WorldObject {
         composite.local.hitbox = Hitbox3.fromJSON(json.local.hitbox, world);
         composite.local.flags = json.local.flags;
         composite.graphicsEngine = graphicsEngine;
+        composite.sleeping = json.sleeping;
+        composite.sleepThreshold = json.sleepThreshold;
+        composite.sleepCounter = json.sleepCounter;
         return composite;
     }
 

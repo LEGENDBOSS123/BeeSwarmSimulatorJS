@@ -39,7 +39,9 @@ var SpatialHash = class {
     }
 
     getCellPosition(v, hash) {
+        
         var v1 = v.add(hash.translation);
+        
         return new Vector3(Math.floor(v1.x * hash.inverseGridSize), Math.floor(v1.y * hash.inverseGridSize), Math.floor(v1.z * hash.inverseGridSize));
     }
 

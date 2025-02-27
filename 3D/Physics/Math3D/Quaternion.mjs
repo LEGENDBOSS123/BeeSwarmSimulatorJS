@@ -22,6 +22,10 @@ var Quaternion = class {
         return this.w == q.w && this.x == q.x && this.y == q.y && this.z == q.z;
     }
 
+    dot(q){
+        return this.w * q.w + this.x * q.x + this.y * q.y + this.z * q.z;
+    }
+
     multiplyInPlace(q) {
         var oldW = this.w;
         var oldX = this.x;

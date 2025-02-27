@@ -23,7 +23,6 @@ var CollisionDetector = class {
     }
 
     addPair(shape1, shape2) {
-
         if (!shape1.canCollideWith(shape2)) {
             return;
         }
@@ -74,23 +73,12 @@ var CollisionDetector = class {
             return false;
         }.bind(this);
         this.world.spatialHash.query(shape.id, func);
-        // var pairs = this.world.spatialHash.query(shape.id);
-        // for(var pair of pairs){
-        //     this.addPair(shape, this.world.getByID(pair));
-        // }
     }
 
     handleAll(shapes) {
-        // var func = function (a, b) {
-        //     this.addPair(this.world.getByID(a), this.world.getByID(b));
-        //     return false;
-        // }.bind(this);
-        // this.world.spatialHash.findAllPairs(func);
-
-        // return;
         this.pairs.clear();
         for (var i in shapes) {
-            if (shapes[i].getLocalFlag(Composite.FLAGS.STATIC)) {
+            if (shapes[i].getLocalFlag(Composite.FLAGS.STATIC) || shapes[i].maxParent.sleeping) {
                 continue;
             }
             this.handle(shapes[i]);
@@ -103,7 +91,7 @@ var CollisionDetector = class {
             this.detectCollision(value[0], value[1]);
         }
         this.resolveAllContacts();
-        
+
     }
 
     broadphase(shape1, shape2) {
@@ -147,16 +135,12 @@ var CollisionDetector = class {
                 var a_body = a.global.body;
                 var b_body = b.global.body;
                 contact.applyForces();
-                a_body.setVelocity(a_body.getVelocity().add(a_body.netForce.scale(a_body.inverseMass).multiply(new Vector3(1 - a_body.linearDamping.x, 1 - a_body.linearDamping.y, 1 - a_body.linearDamping.z))));
-                b_body.setVelocity(b_body.getVelocity().add(b_body.netForce.scale(b_body.inverseMass).multiply(new Vector3(1 - b_body.linearDamping.x, 1 - b_body.linearDamping.y, 1 - b_body.linearDamping.z))));
-                a_body.angularVelocity.addInPlace(a_body.inverseMomentOfInertia.multiplyVector3(a_body.netTorque).scale(1 - a_body.angularDamping));
-                b_body.angularVelocity.addInPlace(b_body.inverseMomentOfInertia.multiplyVector3(b_body.netTorque).scale(1 - b_body.angularDamping));
+                a_body.setVelocity(a_body.getVelocity().add(contact.body1_netForce.scale(a_body.inverseMass).multiply(new Vector3(1 - a_body.linearDamping.x, 1 - a_body.linearDamping.y, 1 - a_body.linearDamping.z))));
+                b_body.setVelocity(b_body.getVelocity().add(contact.body2_netForce.scale(b_body.inverseMass).multiply(new Vector3(1 - b_body.linearDamping.x, 1 - b_body.linearDamping.y, 1 - b_body.linearDamping.z))));
+                a_body.angularVelocity.addInPlace(a_body.inverseMomentOfInertia.multiplyVector3(contact.body1_netTorque).scale(1 - a_body.angularDamping));
+                b_body.angularVelocity.addInPlace(b_body.inverseMomentOfInertia.multiplyVector3(contact.body2_netTorque).scale(1 - b_body.angularDamping));
                 a.syncAll();
                 b.syncAll();
-                a_body.netForce.reset();
-                b_body.netForce.reset();
-                a_body.netTorque.reset();
-                b_body.netTorque.reset();
             }
         }
 
@@ -167,6 +151,8 @@ var CollisionDetector = class {
         }
 
         for (var contact of this.contacts) {
+            // contact.body1.awaken();
+            // contact.body2.awaken();
             var translation = contact.penetration;
             var totalMass = contact.body1.maxParent.getEffectiveTotalMass(contact.normal) + contact.body2.maxParent.getEffectiveTotalMass(contact.normal);
             if (contact.type == "CollisionContact") {
@@ -301,7 +287,7 @@ var CollisionDetector = class {
         var t = f * edge2.dot(q);
         return t > EPSILON;
     }
-    
+
 
     handleSpherePolyhedron(sphere, poly) {
         var spherePos = null;
@@ -354,8 +340,8 @@ var CollisionDetector = class {
                         continue;
                     }
                 }
-               
-                
+
+
                 var closest = this.closestPointOnTriangle(relativePos, a, b, c);
                 var distSq = closest.subtract(relativePos).magnitudeSquared();
                 if (distSq < minDistanceSquared) {
@@ -387,7 +373,7 @@ var CollisionDetector = class {
             }
         }
         t = maxT;
-        
+
         var bin = binarySearch(t, !Number.isFinite(minDistanceSquared));
         if (bin > 0 || !closestPoint) {
             return false;

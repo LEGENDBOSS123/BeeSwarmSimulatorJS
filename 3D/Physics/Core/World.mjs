@@ -13,7 +13,7 @@ var World = class {
         this.deltaTimeSquared = this.deltaTime * this.deltaTime;
         this.inverseDeltaTime = 1 / this.deltaTime;
 
-        this.iterations = options?.iterations ?? 1;
+        this.substeps = options?.substeps ?? 1;
 
         this.all = options?.all ?? {};
         this.constraints = options?.constraints ?? [];
@@ -30,9 +30,13 @@ var World = class {
         this.inverseDeltaTime = 1 / this.deltaTime;
     }
 
-    setIterations(iterations) {
-        this.iterations = iterations;
-        this.setDeltaTime(1 / this.iterations);
+    setSubsteps(substeps) {
+        this.substeps = substeps;
+        this.setDeltaTime(1 / this.substeps);
+    }
+
+    setIterations(iterations){
+        this.collisionDetector.iterations = iterations;
     }
 
     addComposite(composite) {
@@ -87,21 +91,23 @@ var World = class {
         for (var i in this.all) {
             this.all[i].dispatchEvent("preStep");
         }
-        for (var iter = 0; iter < this.iterations; iter++) {
+        for (var iter = 0; iter < this.substeps; iter++) {
             for (var comp of this.composites) {
-                comp.dispatchEvent("preIteration");
-
+                comp.dispatchEvent("preSubstep");
+                if(comp.sleeping){
+                    continue;
+                }
                 if (comp.isMaxParent()) {
                     comp.updateBeforeCollisionAll();
                 }
             }
-            this.collisionDetector.handleAll(this.all);
+            this.collisionDetector.handleAll(this.composites);
             this.collisionDetector.resolveAll();
             for (var comp of this.composites) {
                 if (comp.isMaxParent()) {
                     comp.updateAfterCollisionAll();
                 }
-                comp.dispatchEvent("postIteration");
+                comp.dispatchEvent("postSubstep");
             }
         }
 
@@ -132,7 +138,7 @@ var World = class {
         world.deltaTime = this.deltaTime;
         world.deltaTimeSquared = this.deltaTimeSquared;
         world.inverseDeltaTime = this.inverseDeltaTime;
-        world.iterations = this.iterations;
+        world.substeps = this.substeps;
         world.all = {};
         world.composites = [];
         world.constraints = [];
@@ -149,8 +155,6 @@ var World = class {
             world.constraints[i] = this.constraints[i].id;
         }
 
-
-
         world.spatialHash = null;
         world.collisionDetector = this.collisionDetector.toJSON();
 
@@ -164,7 +168,7 @@ var World = class {
         world.deltaTime = json.deltaTime;
         world.deltaTimeSquared = json.deltaTimeSquared;
         world.inverseDeltaTime = json.inverseDeltaTime;
-        world.iterations = json.iterations;
+        world.substeps = json.substeps;
         world.all = {};
 
         for (var i in json.all) {
