@@ -78,7 +78,7 @@ var CollisionDetector = class {
     handleAll(shapes) {
         this.pairs.clear();
         for (var i in shapes) {
-            if (shapes[i].getLocalFlag(Composite.FLAGS.STATIC) || shapes[i].maxParent.sleeping) {
+            if (shapes[i].maxParent.sleeping) {
                 continue;
             }
             this.handle(shapes[i]);
@@ -91,7 +91,6 @@ var CollisionDetector = class {
             this.detectCollision(value[0], value[1]);
         }
         this.resolveAllContacts();
-
     }
 
     broadphase(shape1, shape2) {
@@ -151,12 +150,13 @@ var CollisionDetector = class {
         }
 
         for (var contact of this.contacts) {
-            // contact.body1.awaken();
-            // contact.body2.awaken();
+            contact.body1.awaken();
+            contact.body2.awaken();
             var translation = contact.penetration;
             var totalMass = contact.body1.maxParent.getEffectiveTotalMass(contact.normal) + contact.body2.maxParent.getEffectiveTotalMass(contact.normal);
-            if (contact.type == "CollisionContact") {
+            if (contact.constructor.name == "COLLISIONCONTACT") {
                 contact.body1.dispatchEvent("preCollision", [contact]);
+                contact.body2.dispatchEvent("preCollision", [contact]);
             }
             var massRatio2 = contact.body2.maxParent.getEffectiveTotalMass() / totalMass;
             massRatio2 = isNaN(massRatio2) ? 1 : massRatio2;
@@ -170,15 +170,12 @@ var CollisionDetector = class {
             if (contact.body2Map.penetrationSum != 0) {
                 contact.body2.translate(translation.scale(-contact.penetration.magnitudeSquared() / contact.body2Map.penetrationSum * massRatio1));
             }
-
-
-            if (contact.type == "CollisionContact") {
+            if (contact.constructor.name == "COLLISIONCONTACT") {
                 contact.body1.dispatchEvent("postCollision", [contact]);
                 contact.body2.dispatchEvent("postCollision", [contact]);
             }
         }
-
-        this.contacts = [];
+        this.contacts.length = 0;
     }
 
     getClosestPointToAABB(v, aabb, dimensions) {

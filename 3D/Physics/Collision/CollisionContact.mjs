@@ -1,9 +1,10 @@
 import Vector3 from "../Math3D/Vector3.mjs";
+import Constraint from "./Constraint.mjs";
 
-
-var CollisionContact = class {
+var CollisionContact = class extends Constraint {
+    static name = "COLLISIONCONTACT";
     constructor(options) {
-        this.type = "CollisionContact";
+        super(options);
         this.impulse = options?.impulse;
 
         this.normal = options?.normal;

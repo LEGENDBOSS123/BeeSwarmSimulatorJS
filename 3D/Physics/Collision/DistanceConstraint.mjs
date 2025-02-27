@@ -109,7 +109,7 @@ var DistanceConstraint = class extends Constraint {
         this.solved = true;
         return true;
     }
-
+    
     setMesh(options, graphicsEngine) {
         var geometry = new graphicsEngine.THREE.BufferGeometry().setFromPoints(this.getPoints());
         var material = new graphicsEngine.THREE.LineBasicMaterial({ color: options?.color ?? 0xff0000 });

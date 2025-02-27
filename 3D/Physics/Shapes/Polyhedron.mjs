@@ -38,19 +38,18 @@ var Polyhedron = class extends Composite {
     }
 
     determineConcavity(faces, vertices) {
-        this.isConvex = true;
-        for (var point of this.localVertices) {
-            for (var face of this.faces) {
-                var a = this.localVertices[face[0]];
-                var b = this.localVertices[face[1]];
-                var c = this.localVertices[face[2]];
+        for (var point of vertices) {
+            for (var face of faces) {
+                var a = vertices[face[0]];
+                var b = vertices[face[1]];
+                var c = vertices[face[2]];
                 var normal = b.subtract(a).cross(c.subtract(a));
                 if (a.subtract(point).dot(normal) < 0) {
-                    this.isConvex = false;
-                    return;
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     calculateGlobalVertices() {

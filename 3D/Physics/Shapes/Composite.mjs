@@ -426,6 +426,7 @@ var Composite = class extends WorldObject {
     }
 
     updateSleepAll() {
+        
         var cannotSleep = false;
         for (var child of this.children) {
             child.updateSleepAll();
@@ -441,14 +442,12 @@ var Composite = class extends WorldObject {
         if (this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999) {
             return this.getSleepy();
         }
-
         return this.awaken();
     }
 
     updateAfterCollisionAll() {
         if (this.isMaxParent()) {
             this.syncAll();
-            this.updateSleepAll();
         }
     }
 

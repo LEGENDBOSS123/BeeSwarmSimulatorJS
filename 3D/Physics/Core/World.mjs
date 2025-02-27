@@ -92,6 +92,12 @@ var World = class {
             this.all[i].dispatchEvent("preStep");
         }
         for (var iter = 0; iter < this.substeps; iter++) {
+            // for (var comp of this.composites) {
+            //     comp.dispatchEvent("preSubstep");
+            //     if (comp.isMaxParent()) {
+            //         comp.updateSleepAll();
+            //     }
+            // }
             for (var comp of this.composites) {
                 comp.dispatchEvent("preSubstep");
                 if(comp.sleeping){
@@ -106,6 +112,7 @@ var World = class {
             for (var comp of this.composites) {
                 if (comp.isMaxParent()) {
                     comp.updateAfterCollisionAll();
+                    comp.updateSleepAll();
                 }
                 comp.dispatchEvent("postSubstep");
             }
