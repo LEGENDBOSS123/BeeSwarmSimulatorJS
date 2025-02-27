@@ -147,11 +147,13 @@ var CollisionDetector = class {
             var contact = this.contacts[i];
             contact.body1Map.penetrationSum += contact.penetration.magnitudeSquared();
             contact.body2Map.penetrationSum += contact.penetration.magnitudeSquared();
+            contact.body1.contacts = [];
+            contact.body2.contacts = [];
         }
 
         for (var contact of this.contacts) {
-            contact.body1.awaken();
-            contact.body2.awaken();
+            contact.body1.contacts.push(contact.body2.id);
+            contact.body2.contacts.push(contact.body1.id);
             var translation = contact.penetration;
             var totalMass = contact.body1.maxParent.getEffectiveTotalMass(contact.normal) + contact.body2.maxParent.getEffectiveTotalMass(contact.normal);
             if (contact.constructor.name == "COLLISIONCONTACT") {

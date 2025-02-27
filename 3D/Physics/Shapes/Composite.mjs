@@ -43,6 +43,8 @@ var Composite = class extends WorldObject {
         this.sleeping = options?.sleeping ?? false;
         this.sleepThreshold = options?.sleepThreshold ?? 16;
         this.sleepCounter = options?.sleepCounter ?? 0;
+        this.isSleepy = options?.isSleepy ?? false;
+        this.contacts = [];
     }
 
 
@@ -425,8 +427,19 @@ var Composite = class extends WorldObject {
         }
     }
 
+    updateIsSleepy(){
+        this.isSleepy = this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999;
+    }
+
     updateSleepAll() {
-        
+        this.updateIsSleepy();
+        for(var c of this.contacts){
+            var c2 = this.world.getByID(c);
+            if(c2 && !(c2.global.body.getVelocity().magnitudeSquared() < 0.0000001 && c2.global.body.actualPreviousPosition.distanceSquared(c2.global.body.position) < 0.0000001 && c2.global.body.previousRotation.dot(c2.global.body.rotation) > 0.9999)){
+                this.awaken();
+                break;
+            }
+        }
         var cannotSleep = false;
         for (var child of this.children) {
             child.updateSleepAll();
@@ -439,7 +452,7 @@ var Composite = class extends WorldObject {
             return;
         }
 
-        if (this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999) {
+        if (this.isSleepy) {
             return this.getSleepy();
         }
         return this.awaken();
@@ -454,6 +467,7 @@ var Composite = class extends WorldObject {
     awaken() {
         this.sleeping = false;
         this.sleepCounter = 0;
+        this.contacts = [];
     }
 
     getSleepy() {

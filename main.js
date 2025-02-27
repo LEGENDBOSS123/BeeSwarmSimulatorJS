@@ -307,29 +307,29 @@ for (var i = 0; i < 0; i++) {
 // world.addComposite(sphere2);
 
 
-var poly = new Polyhedron();
-for(var i of poly.localVertices){
-    i.scaleInPlace(30);
-}
-poly.dimensionsChanged();
-poly.setPosition(new Vector3(0, 100, 0));
-// poly.global.body.setVelocity(new Vector3(0.02, 0, 0));
-poly.setMeshAndAddToScene({}, graphicsEngine);
-poly.setLocalFlag(Composite.FLAGS.STATIC, true);
-world.addComposite(poly);
+// var poly = new Polyhedron();
+// for(var i of poly.localVertices){
+//     i.scaleInPlace(30);
+// }
+// poly.dimensionsChanged();
+// poly.setPosition(new Vector3(0, 100, 0));
+// // poly.global.body.setVelocity(new Vector3(0.02, 0, 0));
+// poly.setMeshAndAddToScene({}, graphicsEngine);
+// poly.setLocalFlag(Composite.FLAGS.STATIC, true);
+// world.addComposite(poly);
 
 
 
-var poly = new Polyhedron();
-for(var i of poly.localVertices){
-    i.scaleInPlace(30);
-}
-poly.dimensionsChanged();
-poly.setPosition(new Vector3(20,120, 0));
-// poly.global.body.setVelocity(new Vector3(0.02, 0, 0));
-poly.setMeshAndAddToScene({}, graphicsEngine);
-poly.setLocalFlag(Composite.FLAGS.STATIC, true);
-world.addComposite(poly);
+// var poly = new Polyhedron();
+// for(var i of poly.localVertices){
+//     i.scaleInPlace(30);
+// }
+// poly.dimensionsChanged();
+// poly.setPosition(new Vector3(20,120, 0));
+// // poly.global.body.setVelocity(new Vector3(0.02, 0, 0));
+// poly.setMeshAndAddToScene({}, graphicsEngine);
+// poly.setLocalFlag(Composite.FLAGS.STATIC, true);
+// world.addComposite(poly);
 
 
 
