@@ -428,7 +428,7 @@ var Composite = class extends WorldObject {
     }
 
     updateIsSleepy() {
-        this.isSleepy = this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999;
+        this.isSleepy = this.global.body.getVelocity().magnitudeSquared() < 0.0001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.999;
     }
 
     updateSleepAll() {

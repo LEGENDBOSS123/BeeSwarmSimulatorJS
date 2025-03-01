@@ -271,7 +271,7 @@ var CollisionDetector = class {
     }
 
     horizontalRayIntersectsTriangle(orig, a, b, c) {
-        var EPSILON = 1e-4;
+        var EPSILON = 1e-8;
         var edge1 = b.subtract(a);
         var edge2 = c.subtract(a);
         var aDot = - edge2.z * edge1.y + edge2.y * edge1.z;
@@ -332,7 +332,6 @@ var CollisionDetector = class {
                 if (poly.isConvex && a.subtract(relativePos).dot(normal) < 0) {
                     isInside = false;
                 }
-
 
                 if (!(min.x <= maxS.x && max.x >= minS.x && min.y <= maxS.y && max.y >= minS.y && min.z <= maxS.z && max.z >= minS.z)) {
                     if (!disableHitbox) {

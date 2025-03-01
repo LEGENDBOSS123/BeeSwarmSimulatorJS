@@ -167,7 +167,7 @@ function maxAxis(b) {
 
 function hasOver2000FacesOrVertices(mesh) {
     const geometry = mesh.geometry;
-    var n = [0, 1100];
+    var n = [0, 2000];
     return true
     const numFaces = geometry.attributes.position.count / 3;
     if (maxAxis(mesh.geometry.boundingBox) < 450 && mesh.material.map?.source?.data?.width != 1024) {
@@ -186,7 +186,7 @@ for (var i = 0; i < 1; i++) {
             child.castShadow = true;
             child.receiveShadow = true;
             if (child.isMesh) {
-                // child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
+                //child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
                 child.material.depthWrite = true;
             }
             if (child.isMesh && hasOver2000FacesOrVertices(child) && 1 == 1) {

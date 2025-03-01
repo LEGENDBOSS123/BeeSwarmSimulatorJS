@@ -10,7 +10,7 @@ var SpatialHash = class {
             spatialHash.hashmap = new Map();
             spatialHash.gridSize = options?.gridSizes?.[i] ?? Math.pow(2, i) * 0.25;
             spatialHash.inverseGridSize = 1 / spatialHash.gridSize;
-            spatialHash.threshold = options?.thresholds?.[i] ?? 1;
+            spatialHash.threshold = options?.thresholds?.[i] ?? 2;
             spatialHash.translation = new Vector3();
             spatialHash.index = i;
             if (spatialHash.index % 2 == 0) {
