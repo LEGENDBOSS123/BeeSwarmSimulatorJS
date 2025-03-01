@@ -427,15 +427,15 @@ var Composite = class extends WorldObject {
         }
     }
 
-    updateIsSleepy(){
+    updateIsSleepy() {
         this.isSleepy = this.global.body.getVelocity().magnitudeSquared() < 0.0000001 && this.global.body.actualPreviousPosition.distanceSquared(this.global.body.position) < 0.0000001 && this.global.body.previousRotation.dot(this.global.body.rotation) > 0.9999;
     }
 
     updateSleepAll() {
         this.updateIsSleepy();
-        for(var c of this.contacts){
+        for (var c of this.contacts) {
             var c2 = this.world.getByID(c);
-            if(c2 && !(c2.global.body.getVelocity().magnitudeSquared() < 0.0000001 && c2.global.body.actualPreviousPosition.distanceSquared(c2.global.body.position) < 0.0000001 && c2.global.body.previousRotation.dot(c2.global.body.rotation) > 0.9999)){
+            if (c2 && !c2.isSleepy) {
                 this.awaken();
                 break;
             }

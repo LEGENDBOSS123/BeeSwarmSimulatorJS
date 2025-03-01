@@ -77,11 +77,11 @@ var CollisionDetector = class {
 
     handleAll(shapes) {
         this.pairs.clear();
-        for (var i in shapes) {
-            if (shapes[i].maxParent.sleeping) {
+        for (var shape of shapes) {
+            if (shape.maxParent.sleeping) {
                 continue;
             }
-            this.handle(shapes[i]);
+            this.handle(shape);
         }
     }
 
