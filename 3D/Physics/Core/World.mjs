@@ -6,7 +6,7 @@ import ClassRegistry from "./ClassRegistry.mjs";
 
 
 
-var World = class {
+const World = class {
     constructor(options) {
         this.maxID = options?.maxID ?? 0;
         this.deltaTime = options?.deltaTime ?? 1;
@@ -65,8 +65,8 @@ var World = class {
             element.parent.children.splice(element.parent.children.indexOf(element), 1);
         }
 
-        for (var i in element.children) {
-            this.removeComposite(element.children[i], false);
+        for (const child of element.children) {
+            this.removeComposite(child, false);
         }
 
         this.remove(element);
@@ -87,18 +87,11 @@ var World = class {
     }
 
     step() {
-        if (top.stopped) return;
-        for (var i in this.all) {
+        for (const i in this.all) {
             this.all[i].dispatchEvent("preStep");
         }
         for (var iter = 0; iter < this.substeps; iter++) {
-            // for (var comp of this.composites) {
-            //     comp.dispatchEvent("preSubstep");
-            //     if (comp.isMaxParent()) {
-            //         comp.updateSleepAll();
-            //     }
-            // }
-            for (var comp of this.composites) {
+            for (const comp of this.composites) {
                 comp.dispatchEvent("preSubstep");
                 if(comp.sleeping){
                     continue;
@@ -109,7 +102,7 @@ var World = class {
             }
             this.collisionDetector.handleAll(this.composites);
             this.collisionDetector.resolveAll();
-            for (var comp of this.composites) {
+            for (const comp of this.composites) {
                 if (comp.isMaxParent()) {
                     comp.updateAfterCollisionAll();
                     comp.updateSleepAll();
@@ -118,16 +111,16 @@ var World = class {
             }
         }
 
-        for (var comp of this.composites) {
+        for (const comp of this.composites) {
             comp.dispatchEvent("postStep");
         }
 
-        for (var comp of this.composites) {
+        for (const comp of this.composites) {
             if (comp.toBeRemoved) {
                 this.removeComposite(comp);
             }
         }
-        for (var cons in this.constraints) {
+        for (const cons in this.constraints) {
             if (cons.toBeRemoved) {
                 this.removeConstraint(cons);
             }
@@ -139,7 +132,7 @@ var World = class {
     }
 
     toJSON() {
-        var world = {};
+        const world = {};
 
         world.maxID = this.maxID;
         world.deltaTime = this.deltaTime;
@@ -150,15 +143,15 @@ var World = class {
         world.composites = [];
         world.constraints = [];
 
-        for (var i in this.all) {
+        for (const i in this.all) {
             world.all[i] = this.getByID(i).toJSON();
         }
 
-        for (var i in this.composites) {
+        for (const i in this.composites) {
             world.composites[i] = this.composites[i].id;
         }
 
-        for (var i in this.constraints) {
+        for (const i in this.constraints) {
             world.constraints[i] = this.constraints[i].id;
         }
 
@@ -169,7 +162,7 @@ var World = class {
     }
 
     static fromJSON(json, graphicsEngine = this.graphicsEngine) {
-        var world = new this();
+        const world = new this();
 
         world.maxID = json.maxID;
         world.deltaTime = json.deltaTime;

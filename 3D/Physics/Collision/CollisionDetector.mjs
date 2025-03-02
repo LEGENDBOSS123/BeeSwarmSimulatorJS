@@ -23,20 +23,23 @@ var CollisionDetector = class {
     }
 
     addPair(shape1, shape2) {
-        if (!shape1.canCollideWith(shape2)) {
-            return;
-        }
-        if (!shape1.global.hitbox.intersects(shape2.global.hitbox)) {
-            return;
-        }
         if (shape1.id > shape2.id) {
-            var temp = shape1;
+            const temp = shape1;
             shape1 = shape2;
             shape2 = temp;
         }
         if (this.pairs.has(shape1.id + this.constructor.seperatorCharacter + shape2.id) || !(this.handlers[shape1.type]?.[shape2.type] || this.handlers[shape2.type]?.[shape1.type])) {
             return;
         }
+        if (!shape1.canCollideWith(shape2)) {
+            return;
+        }
+
+        if (!shape1.global.hitbox.intersects(shape2.global.hitbox)) {
+            return;
+        }
+
+
         return this.pairs.set(shape1.id + this.constructor.seperatorCharacter + shape2.id, [shape1, shape2]);
     }
 
@@ -48,7 +51,7 @@ var CollisionDetector = class {
             return false;
         }
         if (shape1.type > shape2.type) {
-            var temp = shape1;
+            const temp = shape1;
             shape1 = shape2;
             shape2 = temp;
         }
@@ -68,7 +71,7 @@ var CollisionDetector = class {
     }
 
     handle(shape) {
-        var func = function (x) {
+        const func = function (x) {
             this.addPair(shape, this.world.getByID(x));
             return false;
         }.bind(this);
@@ -78,7 +81,7 @@ var CollisionDetector = class {
     handleAll(shapes) {
         this.pairs.clear();
         for (var shape of shapes) {
-            if (shape.maxParent.sleeping) {
+            if (shape.maxParent.sleeping || shape.getLocalFlag(Composite.FLAGS.STATIC)) {
                 continue;
             }
             this.handle(shape);
@@ -99,10 +102,9 @@ var CollisionDetector = class {
 
     resolveAllContacts() {
         this.contacts = this.contacts.concat(this.world.constraints);
-        var maxParentMap = new Object(null);
+        const maxParentMap = new Object(null);
 
-        for (var i = 0; i < this.contacts.length; i++) {
-            var contact = this.contacts[i];
+        for (const contact of this.contacts) {
             contact.solved = false;
             contact.material = contact.body1.material.getCombined(contact.body2.material);
             if (!maxParentMap[contact.body1.maxParent.id]) {
@@ -125,14 +127,14 @@ var CollisionDetector = class {
         }
 
         for (var iter = 0; iter < this.iterations; iter++) {
-            for (var contact of this.contacts) {
+            for (const contact of this.contacts) {
                 if (!contact.solve()) {
                     continue;
                 }
-                var a = contact.body1.maxParent;
-                var b = contact.body2.maxParent;
-                var a_body = a.global.body;
-                var b_body = b.global.body;
+                const a = contact.body1.maxParent;
+                const b = contact.body2.maxParent;
+                const a_body = a.global.body;
+                const b_body = b.global.body;
                 contact.applyForces();
                 a_body.setVelocity(a_body.getVelocity().add(contact.body1_netForce.scale(a_body.inverseMass).multiply(new Vector3(1 - a_body.linearDamping.x, 1 - a_body.linearDamping.y, 1 - a_body.linearDamping.z))));
                 b_body.setVelocity(b_body.getVelocity().add(contact.body2_netForce.scale(b_body.inverseMass).multiply(new Vector3(1 - b_body.linearDamping.x, 1 - b_body.linearDamping.y, 1 - b_body.linearDamping.z))));
@@ -151,7 +153,7 @@ var CollisionDetector = class {
             contact.body2.contacts = [];
         }
 
-        for (var contact of this.contacts) {
+        for (const contact of this.contacts) {
             contact.body1.contacts.push(contact.body2.id);
             contact.body2.contacts.push(contact.body1.id);
             var translation = contact.penetration;
@@ -180,31 +182,8 @@ var CollisionDetector = class {
         this.contacts.length = 0;
     }
 
-    getClosestPointToAABB(v, aabb, dimensions) {
-        var dimensions = dimensions ?? new Vector3(aabb.width, aabb.height, aabb.depth).scale(0.5);
-        if (v.x < -dimensions.x) {
-            v.x = -dimensions.x;
-        }
-        else if (v.x > dimensions.x) {
-            v.x = dimensions.x;
-        }
-        if (v.y < -dimensions.y) {
-            v.y = -dimensions.y;
-        }
-        else if (v.y > dimensions.y) {
-            v.y = dimensions.y;
-        }
-        if (v.z < -dimensions.z) {
-            v.z = -dimensions.z;
-        }
-        else if (v.z > dimensions.z) {
-            v.z = dimensions.z;
-        }
-        return v;
-    }
-
-    clampPointToAABB(v, aabb, dimensions) {
-        var dimensions = dimensions ?? new Vector3(aabb.width, aabb.height, aabb.depth).scale(0.5);
+    clampPointToAABB(v, aabb, dimensions2) {
+        const dimensions = dimensions2 ?? new Vector3(aabb.width, aabb.height, aabb.depth).scale(0.5);
         if (v.x < -dimensions.x) {
             v.x = -dimensions.x;
         }
@@ -227,63 +206,98 @@ var CollisionDetector = class {
     }
 
     closestPointOnTriangle(p, a, b, c) {
-        var ab = b.subtract(a);
-        var ac = c.subtract(a);
-        var ap = p.subtract(a);
+        const abx = b.x - a.x
+        const aby = b.y - a.y;
+        const abz = b.z - a.z;
+        const acx = c.x - a.x;
+        const acy = c.y - a.y;
+        const acz = c.z - a.z;
+        const apx = p.x - a.x;
+        const apy = p.y - a.y;
+        const apz = p.z - a.z;
 
-        var d1 = ab.dot(ap);
-        var d2 = ac.dot(ap);
+        const d1 = abx * apx + aby * apy + abz * apz;
+        const d2 = acx * apx + acy * apy + acz * apz;
+        if (d1 <= 0 && d2 <= 0) {
+            return new Vector3(a.x, a.y, a.z);
+        }
 
-        if (d1 <= 0 && d2 <= 0) return a;
+        const bpx = p.x - b.x;
+        const bpy = p.y - b.y;
+        const bpz = p.z - b.z;
+        const d3 = abx * bpx + aby * bpy + abz * bpz;
+        const d4 = acx * bpx + acy * bpy + acz * bpz;
+        if (d3 >= 0 && d4 <= d3) {
+            return new Vector3(b.x, b.y, b.z);
+        }
 
-        var bp = p.subtract(b);
-        var d3 = ab.dot(bp);
-        var d4 = ac.dot(bp);
-        if (d3 >= 0 && d4 <= d3) return b
+        const cpx = p.x - c.x;
+        const cpy = p.y - c.y;
+        const cpz = p.z - c.z;
+        const d5 = abx * cpx + aby * cpy + abz * cpz;
+        const d6 = acx * cpx + acy * cpy + acz * cpz;
+        if (d6 >= 0 && d5 <= d6) {
+            return new Vector3(c.x, c.y, c.z);
+        }
 
-        var cp = p.subtract(c);
-        var d5 = ab.dot(cp);
-        var d6 = ac.dot(cp);
-        if (d6 >= 0 && d5 <= d6) return c;
-
-        var vc = d1 * d4 - d3 * d2;
+        const vc = d1 * d4 - d3 * d2;
         if (vc <= 0 && d1 >= 0 && d3 <= 0) {
-            var v = d1 / (d1 - d3);
-            return a.add(ab.scale(v));
+            const v = d1 / (d1 - d3);
+            return new Vector3(a.x + abx * v, a.y + aby * v, a.z + abz * v);
         }
 
-        var vb = d5 * d2 - d1 * d6;
+        const vb = d5 * d2 - d1 * d6;
         if (vb <= 0 && d2 >= 0 && d6 <= 0) {
-            var w = d2 / (d2 - d6);
-            return a.add(ac.scale(w));
+            const w = d2 / (d2 - d6);
+            return new Vector3(a.x + acx * w, a.y + acy * w, a.z + acz * w);
         }
 
-        var va = d3 * d6 - d5 * d4;
+        const va = d3 * d6 - d5 * d4;
         if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
-            var w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-            return b.add(c.subtract(b).scale(w));
+            const w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+            const bcx = c.x - b.x, bcy = c.y - b.y, bcz = c.z - b.z;
+            return new Vector3(b.x + bcx * w, b.y + bcy * w, b.z + bcz * w);
         }
 
-        var denom = 1 / (va + vb + vc);
-        var v = vb * denom;
-        var w = vc * denom;
-        return a.add(ab.scale(v)).add(ac.scale(w));
+        const denom = 1 / (va + vb + vc);
+        const v = vb * denom;
+        const w = vc * denom;
+        return new Vector3(a.x + abx * v + acx * w, a.y + aby * v + acy * w, a.z + abz * v + acz * w);
     }
 
+
+
     horizontalRayIntersectsTriangle(orig, a, b, c) {
-        var EPSILON = 1e-8;
-        var edge1 = b.subtract(a);
-        var edge2 = c.subtract(a);
-        var aDot = - edge2.z * edge1.y + edge2.y * edge1.z;
-        if (Math.abs(aDot) < EPSILON) return false;
-        var f = 1 / aDot;
-        var s = orig.subtract(a);
-        var u = f * (s.z * edge2.y - s.y * edge2.z);
-        if (u < 0 || u >= 1) return false;
-        var q = s.cross(edge1);
-        var v = f * q.x;
-        if (v < 0 || (u + v) >= 1) return false;
-        var t = f * edge2.dot(q);
+        const EPSILON = 1e-8;
+        const ax = a.x;
+        const ay = a.y;
+        const az = a.z;
+        const edge1x = b.x - ax;
+        const edge1y = b.y - ay;
+        const edge1z = b.z - az;
+        const edge2x = c.x - ax;
+        const edge2y = c.y - ay;
+        const edge2z = c.z - az;
+        const aDot = edge2y * edge1z - edge2z * edge1y;
+        if (Math.abs(aDot) < EPSILON) {
+            return false;
+        }
+        const f = 1 / aDot;
+        const sx = orig.x - ax;
+        const sy = orig.y - ay;
+        const sz = orig.z - az;
+        var u = f * (sz * edge2y - sy * edge2z);
+        if (u < 0 || u >= 1) {
+            return false;
+        }
+        const qx = sy * edge1z - sz * edge1y;
+        const qy = sz * edge1x - sx * edge1z;
+        const qz = sx * edge1y - sy * edge1x;
+        const v = f * qx;
+        if (v < 0 || u + v >= 1) {
+            return false;
+        }
+        const t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         return t > EPSILON;
     }
 
@@ -299,6 +313,7 @@ var CollisionDetector = class {
         var maxT = 1;
         var closestNormal = null;
         var isInside = false;
+        var tempVec = new Vector3(1, 1, 1).scale(sphere.radius);
         var binarySearch = function (t, disableHitbox = false) {
             spherePos = sphere.global.body.previousPosition.lerp(sphere.global.body.position, t);
             polyPos = poly.global.body.previousPosition.lerp(poly.global.body.position, t);
@@ -310,8 +325,6 @@ var CollisionDetector = class {
             isInside = poly.isConvex;
             var min = new Vector3();
             var max = new Vector3();
-            var minS = relativePos.subtract(new Vector3(1, 1, 1).scale(sphere.radius));
-            var maxS = relativePos.add(new Vector3(1, 1, 1).scale(sphere.radius));
             for (var face of poly.faces) {
                 var a = poly.localVertices[face[0]];
                 var b = poly.localVertices[face[1]];
@@ -333,7 +346,7 @@ var CollisionDetector = class {
                     isInside = false;
                 }
 
-                if (!(min.x <= maxS.x && max.x >= minS.x && min.y <= maxS.y && max.y >= minS.y && min.z <= maxS.z && max.z >= minS.z)) {
+                if (!(min.x <= relativePos.x + tempVec.x && max.x >= relativePos.x - tempVec.x && min.y <= relativePos.y + tempVec.y && max.y >= relativePos.y - tempVec.y && min.z <= relativePos.z + tempVec.z && max.z >= relativePos.z - tempVec.z)) {
                     if (!disableHitbox) {
                         continue;
                     }
@@ -361,7 +374,8 @@ var CollisionDetector = class {
         }.bind(this);
 
         var t = 1;
-        for (var i = 0; i < this.binarySearchDepth; i++) {
+        var depth = poly.isConvex ? this.binarySearchDepth : 1;
+        for (var i = 0; i < depth; i++) {
             t = (minT + maxT) / 2;
             var result = binarySearch(t);
             if (result > 0) {
@@ -372,13 +386,13 @@ var CollisionDetector = class {
         }
         t = maxT;
 
-        var bin = binarySearch(t, !Number.isFinite(minDistanceSquared));
+        const bin = binarySearch(t, !Number.isFinite(minDistanceSquared));
         if (bin > 0 || !closestPoint) {
             return false;
         }
 
-        var closestPoint2 = poly.global.body.rotation.multiplyVector3(closestPoint).addInPlace(polyPos);
-        var contact = new CollisionContact();
+        const closestPoint2 = poly.global.body.rotation.multiplyVector3(closestPoint).addInPlace(polyPos);
+        const contact = new CollisionContact();
         contact.point = poly.translateLocalToWorld(closestPoint);
         contact.normal = spherePos.subtract(closestPoint2).normalizeInPlace();
         if (contact.normal.magnitudeSquared() == 0) {
@@ -389,9 +403,7 @@ var CollisionDetector = class {
         }
 
         contact.penetration = contact.normal.scale(sphere.radius).add(contact.point.subtract(sphere.global.body.position).projectOnto(contact.normal));
-        if (contact.penetration.magnitude() > 1) {
-            //top.stopped = true;
-        }
+
         contact.body1 = sphere;
         contact.body2 = poly;
         contact.point = sphere.global.body.position.subtract(contact.normal.scale(sphere.radius));

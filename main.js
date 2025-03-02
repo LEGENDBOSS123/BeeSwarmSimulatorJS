@@ -188,22 +188,23 @@ for (var i = 0; i < 1; i++) {
             if (child.isMesh) {
                 //child.quaternion.copy((new THREE.Quaternion(0.7071066498756409, 0, 0, 0.7071066498756409)).multiply(child.quaternion));
                 child.material.depthWrite = true;
+                child.material.color.setHex(Math.random() * 256**3);
+
             }
             if (child.isMesh && hasOver2000FacesOrVertices(child) && 1 == 1) {
-                var s = 0;
                 //child.scale.x = 30; child.scale.y = 30; child.scale.z = 30;
                 var poly = new Polyhedron({ local: { body: { mass: 1 } } }).fromMesh(child, graphicsEngine);
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                // poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                // poly.addToScene(graphicsEngine.scene);
+                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
                 // composite.add(poly);
                 //graphicsEngine.scene.add(child);
-                // top.e = child;
+                top.e = child;
                 // child.geometry.computeVertexNormals();
                 world.addComposite(poly);
                 top.poly = poly;
@@ -216,7 +217,7 @@ for (var i = 0; i < 1; i++) {
         player.respawn();
     });
 }
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 0; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;

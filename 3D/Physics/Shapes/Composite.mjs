@@ -5,7 +5,7 @@ import Vector3 from "../Math3D/Vector3.mjs";
 import Matrix3 from "../Math3D/Matrix3.mjs";
 import WorldObject from "../Core/WorldObject.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
-var Composite = class extends WorldObject {
+const Composite = class extends WorldObject {
 
     static FLAGS = {
         STATIC: 1 << 0,
@@ -49,7 +49,7 @@ var Composite = class extends WorldObject {
 
 
     setBitMask(mask, letter, value) {
-        var position = letter.charCodeAt(0) - "A".charCodeAt(0);
+        const position = letter.charCodeAt(0) - "A".charCodeAt(0);
         if (value) {
             return mask |= 1 << position;
         }
@@ -64,7 +64,7 @@ var Composite = class extends WorldObject {
     }
 
     toggleBitMask(mask, letter) {
-        var position = letter.charCodeAt(0) - "A".charCodeAt(0);
+        const position = letter.charCodeAt(0) - "A".charCodeAt(0);
         return mask ^= 1 << position;
     }
 
@@ -79,7 +79,7 @@ var Composite = class extends WorldObject {
         if (!this.events[event]) {
             return;
         }
-        var index = this.events[event].indexOf(callback);
+        const index = this.events[event].indexOf(callback);
         if (index == -1) {
             return;
         }
@@ -111,23 +111,23 @@ var Composite = class extends WorldObject {
     }
 
     rotateLocalMomentOfInertia(quaternion) {
-        var rotationMatrix = quaternion.toMatrix3();
-        var result = rotationMatrix.multiply(this.local.body.momentOfInertia).multiply(rotationMatrix.transpose());
+        const rotationMatrix = quaternion.toMatrix3();
+        const result = rotationMatrix.multiply(this.local.body.momentOfInertia).multiply(rotationMatrix.transpose());
         return result;
     }
 
     calculateGlobalMomentOfInertia() {
         this.global.body.momentOfInertia.setMatrix3(this.rotateLocalMomentOfInertia(this.global.body.rotation));
-        var mass = this.local.body.mass;
-        var dx = this.maxParent.global.body.position.x - this.global.body.position.x;
-        var dy = this.maxParent.global.body.position.y - this.global.body.position.y;
-        var dz = this.maxParent.global.body.position.z - this.global.body.position.z;
-        var Ixx = mass * (dy * dy + dz * dz);
-        var Iyy = mass * (dx * dx + dz * dz);
-        var Izz = mass * (dx * dx + dy * dy);
-        var Ixy = - mass * dx * dy;
-        var Ixz = - mass * dx * dz;
-        var Iyz = - mass * dy * dz;
+        const mass = this.local.body.mass;
+        const dx = this.maxParent.global.body.position.x - this.global.body.position.x;
+        const dy = this.maxParent.global.body.position.y - this.global.body.position.y;
+        const dz = this.maxParent.global.body.position.z - this.global.body.position.z;
+        const Ixx = mass * (dy * dy + dz * dz);
+        const Iyy = mass * (dx * dx + dz * dz);
+        const Izz = mass * (dx * dx + dy * dy);
+        const Ixy = - mass * dx * dy;
+        const Ixz = - mass * dx * dz;
+        const Iyz = - mass * dy * dz;
         this.global.body.momentOfInertia.elements[0] += Ixx;
         this.global.body.momentOfInertia.elements[1] += Ixy;
         this.global.body.momentOfInertia.elements[2] += Ixz;
@@ -213,7 +213,7 @@ var Composite = class extends WorldObject {
             return;
         }
         if (this.isMaxParent()) {
-            var velocity = this.global.body.getVelocity()
+            const velocity = this.global.body.getVelocity()
             this.global.body.position.addInPlace(v.multiply(new Vector3(1, 1, 1).subtract(this.global.body.linearDamping)));
             this.global.body.setVelocity(velocity);
             this.translateChildrenGlobal(v);
@@ -224,8 +224,8 @@ var Composite = class extends WorldObject {
 
     setParentAll(parent) {
         this.parent = parent;
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].setParentAll(parent);
+        for (const child of this.children) {
+            child.setParentAll(parent);
         }
     }
 
@@ -242,8 +242,8 @@ var Composite = class extends WorldObject {
 
     setMaxParentAll(maxParent) {
         this.maxParent = maxParent;
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].setMaxParentAll(maxParent);
+        for (const child of this.children) {
+            child.setMaxParentAll(maxParent);
         }
     }
     removeSelf() {
@@ -315,9 +315,9 @@ var Composite = class extends WorldObject {
         if (!this.children.length) {
             return this.global.body.position.copy();
         }
-        var centerOfMass = skip ? new Vector3() : this.global.body.position.scale(this.local.body.mass);
-        for (var i = 0; i < this.children.length; i++) {
-            centerOfMass.addInPlace(this.children[i].getCenterOfMass().scale(this.children[i].global.body.mass));
+        const centerOfMass = skip ? new Vector3() : this.global.body.position.scale(this.local.body.mass);
+        for (const child of this.children) {
+            centerOfMass.addInPlace(child.getCenterOfMass().scale(child.global.body.mass));
         }
         centerOfMass.scaleInPlace(1 / (this.global.body.mass - (skip ? this.local.body.mass : 0)));
         return centerOfMass;
@@ -326,8 +326,8 @@ var Composite = class extends WorldObject {
     calculatePropertiesAll() {
 
         this.global.body.mass = this.local.body.mass;
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].calculatePropertiesAll();
+        for (const child of this.children) {
+            child.calculatePropertiesAll();
         }
 
         if (this.parent) {
@@ -357,13 +357,13 @@ var Composite = class extends WorldObject {
             this.global.flags = this.local.flags;
         }
 
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].syncAll();
+        for (const child of this.children) {
+            child.syncAll();
         }
 
         if (this.getLocalFlag(this.constructor.FLAGS.CENTER_OF_MASS)) {
-            var centerOfMass = this.getCenterOfMass(true);
-            var translationAmount = this.global.body.rotation.conjugate().multiplyVector3(this.global.body.position.subtract(centerOfMass));
+            const centerOfMass = this.getCenterOfMass(true);
+            const translationAmount = this.global.body.rotation.conjugate().multiplyVector3(this.global.body.position.subtract(centerOfMass));
             this.translateChildren(translationAmount);
         }
     }
@@ -373,14 +373,14 @@ var Composite = class extends WorldObject {
         if (this.world?.spatialHash && this.getLocalFlag(this.constructor.FLAGS.OCCUPIES_SPACE)) {
             this.world.spatialHash.addHitbox(this.global.hitbox, this.id);
         }
-        for (var child of this.children) {
+        for (const child of this.children) {
             child.updateGlobalHitboxAll();
         }
     }
 
     updateGlobalMomentOfInertiaAll() {
         this.calculateGlobalMomentOfInertia();
-        for (var child of this.children) {
+        for (const child of this.children) {
             child.updateGlobalMomentOfInertiaAll();
         }
         this.global.body.inverseMomentOfInertia = this.global.body.momentOfInertia.invert();
@@ -393,7 +393,7 @@ var Composite = class extends WorldObject {
         else {
             this.maxParent.global.body.momentOfInertia.addInPlace(this.global.body.momentOfInertia);
         }
-        for (var child of this.children) {
+        for (const child of this.children) {
             child.updateMaxParentMomentOfInertia();
         }
         if (this.isMaxParent()) {
@@ -413,8 +413,8 @@ var Composite = class extends WorldObject {
 
     updateBeforeCollisionAll() {
 
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].updateBeforeCollisionAll();
+        for (const child of this.children) {
+            child.updateBeforeCollisionAll();
         }
 
         this.update();
@@ -433,15 +433,15 @@ var Composite = class extends WorldObject {
 
     updateSleepAll() {
         this.updateIsSleepy();
-        for (var c of this.contacts) {
-            var c2 = this.world.getByID(c);
+        for (const c of this.contacts) {
+            const c2 = this.world.getByID(c);
             if (c2 && !c2.isSleepy) {
                 this.awaken();
                 break;
             }
         }
         var cannotSleep = false;
-        for (var child of this.children) {
+        for (const child of this.children) {
             child.updateSleepAll();
             if (!child.sleeping) {
                 cannotSleep = true;
@@ -483,16 +483,16 @@ var Composite = class extends WorldObject {
     }
 
     translateChildren(v) {
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].local.body.position.addInPlace(v);
-            this.children[i].local.body.previousPosition.addInPlace(v);
+        for (const child of this.children) {
+            child.local.body.position.addInPlace(v);
+            child.local.body.previousPosition.addInPlace(v);
         }
     }
 
     translateChildrenGlobal(v) {
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].global.body.position.addInPlace(v);
-            this.children[i].global.body.previousPosition.addInPlace(v);
+        for (const child of this.children) {
+            child.global.body.position.addInPlace(v);
+            child.global.body.previousPosition.addInPlace(v);
         }
     }
 
@@ -501,20 +501,20 @@ var Composite = class extends WorldObject {
             return;
         }
         this.mesh.mesh.position.set(...this.global.body.position.lerp(last.global.body.position, 1 - lerp));
-        var quat = this.global.body.rotation.slerp(last.global.body.rotation, 1 - lerp);
+        const quat = this.global.body.rotation.slerp(last.global.body.rotation, 1 - lerp);
         this.mesh.mesh.quaternion.set(...[quat.x, quat.y, quat.z, quat.w]);
         this.mesh.mesh.visible = true;
     }
 
     toJSON() {
-        var composite = super.toJSON();
+        const composite = super.toJSON();
         composite.id = this.id;
         composite.world = this.world?.id ?? null;
         composite.parent = this.parent?.id ?? null;
         composite.maxParent = this.maxParent.id;
         composite.children = [];
-        for (var i of this.children) {
-            composite.children.push(i.id);
+        for (const child of this.children) {
+            composite.children.push(child.id);
         }
         composite.toBeRemoved = this.toBeRemoved;
         composite.material = this.material.toJSON();
@@ -533,14 +533,14 @@ var Composite = class extends WorldObject {
     }
 
     static fromJSON(json, world, graphicsEngine) {
-        var composite = super.fromJSON(json, world, graphicsEngine);
+        const composite = super.fromJSON(json, world, graphicsEngine);
         composite.world = world;
         composite.id = json.id;
         composite.parent = json.parent;
         composite.maxParent = json.maxParent;
         composite.children = [];
-        for (var i of json.children) {
-            composite.children.push(i);
+        for (const child of json.children) {
+            composite.children.push(child);
         }
         composite.toBeRemoved = json.toBeRemoved;
         composite.material = Material.fromJSON(json.material, world);

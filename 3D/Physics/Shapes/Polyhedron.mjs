@@ -33,17 +33,17 @@ var Polyhedron = class extends Composite {
     }
 
     dimensionsChanged() {
-        super.dimensionsChanged();
         this.isConvex = this.determineConcavity(this.faces, this.localVertices);
+        super.dimensionsChanged();
     }
 
     determineConcavity(faces, vertices) {
-        for (var point of vertices) {
-            for (var face of faces) {
-                var a = vertices[face[0]];
-                var b = vertices[face[1]];
-                var c = vertices[face[2]];
-                var normal = b.subtract(a).cross(c.subtract(a));
+        for (const point of vertices) {
+            for (const face of faces) {
+                const a = vertices[face[0]];
+                const b = vertices[face[1]];
+                const c = vertices[face[2]];
+                const normal = b.subtract(a).cross(c.subtract(a));
                 if (a.subtract(point).dot(normal) < 0) {
                     return false;
                 }
