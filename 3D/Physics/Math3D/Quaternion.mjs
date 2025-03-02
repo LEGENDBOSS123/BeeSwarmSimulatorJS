@@ -2,7 +2,7 @@ import Vector3 from "./Vector3.mjs";
 import Matrix3 from "./Matrix3.mjs";
 
 
-var Quaternion = class {
+const Quaternion = class {
     constructor(w = 1, x = 0, y = 0, z = 0) {
         this.w = w;
         this.x = x;
@@ -11,10 +11,10 @@ var Quaternion = class {
     }
 
     multiply(q) {
-        var w = this.w * q.w - this.x * q.x - this.y * q.y - this.z * q.z;
-        var x = this.w * q.x + this.x * q.w + this.y * q.z - this.z * q.y;
-        var y = this.w * q.y + this.y * q.w + this.z * q.x - this.x * q.z;
-        var z = this.w * q.z + this.z * q.w + this.x * q.y - this.y * q.x;
+        const w = this.w * q.w - this.x * q.x - this.y * q.y - this.z * q.z;
+        const x = this.w * q.x + this.x * q.w + this.y * q.z - this.z * q.y;
+        const y = this.w * q.y + this.y * q.w + this.z * q.x - this.x * q.z;
+        const z = this.w * q.z + this.z * q.w + this.x * q.y - this.y * q.x;
         return new this.constructor(w, x, y, z);
     }
 
@@ -27,10 +27,10 @@ var Quaternion = class {
     }
 
     multiplyInPlace(q) {
-        var oldW = this.w;
-        var oldX = this.x;
-        var oldY = this.y;
-        var oldZ = this.z;
+        const oldW = this.w;
+        const oldX = this.x;
+        const oldY = this.y;
+        const oldZ = this.z;
         this.w = oldW * q.w - oldX * q.x - oldY * q.y - oldZ * q.z;
         this.x = oldW * q.x + oldX * q.w + oldY * q.z - oldZ * q.y;
         this.y = oldW * q.y + oldY * q.w + oldZ * q.x - oldX * q.z;
@@ -39,14 +39,14 @@ var Quaternion = class {
     }
 
     multiplyVector3(v) {
-        var q = new this.constructor(0, v.x, v.y, v.z);
-        var finalQ = this.multiply(q).multiply(this.conjugate());
+        const q = new this.constructor(0, v.x, v.y, v.z);
+        const finalQ = this.multiply(q).multiply(this.conjugate());
         return new Vector3(finalQ.x, finalQ.y, finalQ.z);
     }
 
     multiplyVector3InPlace(v) {
-        var q = new this.constructor(0, v.x, v.y, v.z);
-        var finalQ = this.multiply(q).multiply(this.conjugate());
+        const q = new this.constructor(0, v.x, v.y, v.z);
+        const finalQ = this.multiply(q).multiply(this.conjugate());
         v.x = finalQ.x;
         v.y = finalQ.y;
         v.z = finalQ.z;
@@ -57,7 +57,7 @@ var Quaternion = class {
         if (t == 0 || t == 1) {
             return (t == 0) ? this.copy() : q.copy();
         }
-        let cosHalfTheta = this.w * q.w + this.x * q.x + this.y * q.y + this.z * q.z;
+        var cosHalfTheta = this.w * q.w + this.x * q.x + this.y * q.y + this.z * q.z;
 
         if (cosHalfTheta < 0) {
             q = new this.constructor(-q.w, -q.x, -q.y, -q.z);
@@ -65,11 +65,11 @@ var Quaternion = class {
         }
 
         if (cosHalfTheta > 0.9995) {
-            let w = this.w + t * (q.w - this.w);
-            let x = this.x + t * (q.x - this.x);
-            let y = this.y + t * (q.y - this.y);
-            let z = this.z + t * (q.z - this.z);
-            let norm = Math.sqrt(w * w + x * x + y * y + z * z);
+            var w = this.w + t * (q.w - this.w);
+            var x = this.x + t * (q.x - this.x);
+            var y = this.y + t * (q.y - this.y);
+            var z = this.z + t * (q.z - this.z);
+            var norm = Math.sqrt(w * w + x * x + y * y + z * z);
             return new this.constructor(w / norm, x / norm, y / norm, z / norm);
         }
 
@@ -104,7 +104,7 @@ var Quaternion = class {
     }
 
     normalize() {
-        var length = this.magnitude();
+        const length = this.magnitude();
         if (length == 0) {
             return this;
         }
@@ -112,7 +112,7 @@ var Quaternion = class {
     }
 
     normalizeInPlace() {
-        var length = this.magnitude();
+        const length = this.magnitude();
         if (length == 0) {
             return this;
         }
@@ -156,16 +156,16 @@ var Quaternion = class {
     }
 
     toMatrix3() {
-        var matrix = new Matrix3();
-        var wx = this.w * this.x;
-        var wy = this.w * this.y;
-        var wz = this.w * this.z;
-        var xx = this.x * this.x;
-        var xy = this.x * this.y;
-        var xz = this.x * this.z;
-        var yy = this.y * this.y;
-        var yz = this.y * this.z;
-        var zz = this.z * this.z;
+        const matrix = new Matrix3();
+        const wx = this.w * this.x;
+        const wy = this.w * this.y;
+        const wz = this.w * this.z;
+        const xx = this.x * this.x;
+        const xy = this.x * this.y;
+        const xz = this.x * this.z;
+        const yy = this.y * this.y;
+        const yz = this.y * this.z;
+        const zz = this.z * this.z;
 
         matrix.elements[0] = 1 - 2 * (yy + zz);
         matrix.elements[1] = 2 * (xy - wz);
@@ -183,17 +183,17 @@ var Quaternion = class {
     }
 
     rotateByAngularVelocity(angularVelocity) {
-        var angularVelocityQuaternion = new Quaternion(1, angularVelocity.x * 0.5, angularVelocity.y * 0.5, angularVelocity.z * 0.5);
+        const angularVelocityQuaternion = new Quaternion(1, angularVelocity.x * 0.5, angularVelocity.y * 0.5, angularVelocity.z * 0.5);
         return angularVelocityQuaternion.multiply(this).normalizeInPlace();
     }
 
 
     static lookAt(direction, up) {
 
-        var right = up.cross(direction).normalize();
+        const right = up.cross(direction).normalize();
         up = direction.cross(right);
 
-        var trace = right.x + up.y + direction.z;
+        const trace = right.x + up.y + direction.z;
 
         var w;
         var x;

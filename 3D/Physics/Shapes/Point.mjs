@@ -1,7 +1,7 @@
 import Composite from "./Composite.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
-var Point = class extends Composite {
+const Point = class extends Composite {
     static name = "POINT";
     constructor(options) {
         super(options);

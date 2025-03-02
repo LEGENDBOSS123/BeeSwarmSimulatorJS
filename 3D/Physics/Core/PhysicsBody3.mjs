@@ -2,7 +2,7 @@ import Vector3 from "../Math3D/Vector3.mjs";
 import Matrix3 from "../Math3D/Matrix3.mjs";
 import Quaternion from "../Math3D/Quaternion.mjs";
 
-var PhysicsBody3 = class {
+const PhysicsBody3 = class {
     constructor(options) {
         this.mass = options?.mass ?? 1;
         this.inverseMass = options?.inverseMass ?? 1 / this.mass;

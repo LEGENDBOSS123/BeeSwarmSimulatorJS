@@ -1,4 +1,4 @@
-var ClassRegistry = class {
+const ClassRegistry = class {
     static max_id = 0;
     static names = {};
     static types = {};

@@ -2,7 +2,7 @@ import Composite from "./Composite.mjs";
 import Vector3 from "../Math3D/Vector3.mjs";
 import Matrix3 from "../Math3D/Matrix3.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
-var Sphere = class extends Composite {
+const Sphere = class extends Composite {
 
     static name = "SPHERE";
 

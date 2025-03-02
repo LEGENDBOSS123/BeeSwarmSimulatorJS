@@ -6,7 +6,7 @@ import Quaternion from "../Math3D/Quaternion.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
 
-var Box = class extends Composite {
+const Box = class extends Composite {
     static name = "BOX";
     constructor(options) {
         super(options);

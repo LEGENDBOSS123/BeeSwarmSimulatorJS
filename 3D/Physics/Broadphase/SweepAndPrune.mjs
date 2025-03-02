@@ -1,7 +1,7 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 import Hitbox3 from "../Broadphase/Hitbox3.mjs";
 
-var SweepAndPrune = class {
+const SweepAndPrune = class {
 
     constructor(options) {
         this.world = options?.world ?? null;

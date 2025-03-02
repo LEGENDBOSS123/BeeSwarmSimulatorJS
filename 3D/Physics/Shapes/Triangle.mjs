@@ -1,7 +1,7 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 import Hitbox3 from "../Broadphase/Hitbox3.mjs";
 
-var Triangle = class {
+const Triangle = class {
     constructor(a = new Vector3(), b = new Vector3(), c = new Vector3()) {
         this.a = a;
         this.b = b;

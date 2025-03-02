@@ -7,7 +7,7 @@ var Matrix3 = class {
     }
 
     scale(s) {
-        var result = new this.constructor();
+        const result = new this.constructor();
         result.elements = [
             this.elements[0] * s,
             this.elements[1] * s,
@@ -36,7 +36,7 @@ var Matrix3 = class {
     }
 
     add(m) {
-        var result = new this.constructor();
+        const result = new this.constructor();
         result.elements = [
             this.elements[0] + m.elements[0],
             this.elements[1] + m.elements[1],
@@ -65,16 +65,16 @@ var Matrix3 = class {
     }
 
     multiplyVector3(v) {
-        var result = new Vector3();
+        const result = new Vector3();
         result.x = this.elements[0] * v.x + this.elements[1] * v.y + this.elements[2] * v.z;
         result.y = this.elements[3] * v.x + this.elements[4] * v.y + this.elements[5] * v.z;
         result.z = this.elements[6] * v.x + this.elements[7] * v.y + this.elements[8] * v.z;
         return result;
     }
 
-    multiply(m) {
-        m = m.elements;
-        var result = new this.constructor();
+    multiply(m2) {
+        const m = m.elements;
+        const result = new this.constructor();
         result.elements = [
             this.elements[0] * m[0] + this.elements[3] * m[1] + this.elements[6] * m[2],
             this.elements[1] * m[0] + this.elements[4] * m[1] + this.elements[7] * m[2],
@@ -96,12 +96,12 @@ var Matrix3 = class {
     }
 
     invert() {
-        var determinant = this.elements[0] * (this.elements[4] * this.elements[8] - this.elements[5] * this.elements[7]) - this.elements[1] * (this.elements[3] * this.elements[8] - this.elements[5] * this.elements[6]) + this.elements[2] * (this.elements[3] * this.elements[7] - this.elements[4] * this.elements[6]);
+        const determinant = this.elements[0] * (this.elements[4] * this.elements[8] - this.elements[5] * this.elements[7]) - this.elements[1] * (this.elements[3] * this.elements[8] - this.elements[5] * this.elements[6]) + this.elements[2] * (this.elements[3] * this.elements[7] - this.elements[4] * this.elements[6]);
         if (Math.abs(determinant) < 1e-10) {
             return this.constructor.zero();
         }
-        var inverseDeterminant = 1 / determinant;
-        var result = new this.constructor();
+        const inverseDeterminant = 1 / determinant;
+        const result = new this.constructor();
         result.elements = [
             (this.elements[4] * this.elements[8] - this.elements[5] * this.elements[7]) * inverseDeterminant,
             (this.elements[2] * this.elements[7] - this.elements[1] * this.elements[8]) * inverseDeterminant,
@@ -118,7 +118,7 @@ var Matrix3 = class {
     }
 
     invertInPlace() {
-        var det = this.elements[0] * (this.elements[4] * this.elements[8] - this.elements[5] * this.elements[7]) -
+        const det = this.elements[0] * (this.elements[4] * this.elements[8] - this.elements[5] * this.elements[7]) -
             this.elements[1] * (this.elements[3] * this.elements[8] - this.elements[5] * this.elements[6]) +
             this.elements[2] * (this.elements[3] * this.elements[7] - this.elements[4] * this.elements[6]);
 
@@ -126,11 +126,17 @@ var Matrix3 = class {
             return this.constructor.zero();
         }
 
-        var invDet = 1 / det;
+        const invDet = 1 / det;
 
-        var a00 = this.elements[0], a01 = this.elements[1], a02 = this.elements[2];
-        var a10 = this.elements[3], a11 = this.elements[4], a12 = this.elements[5];
-        var a20 = this.elements[6], a21 = this.elements[7], a22 = this.elements[8];
+        const a00 = this.elements[0];
+        const a01 = this.elements[1];
+        const a02 = this.elements[2];
+        const a10 = this.elements[3];
+        const a11 = this.elements[4];
+        const a12 = this.elements[5];
+        const a20 = this.elements[6];
+        const a21 = this.elements[7];
+        const a22 = this.elements[8];
 
         this.elements[0] = (a11 * a22 - a12 * a21) * invDet;
         this.elements[1] = (a02 * a21 - a01 * a22) * invDet;
@@ -149,7 +155,7 @@ var Matrix3 = class {
 
 
     transpose() {
-        var result = new this.constructor();
+        const result = new this.constructor();
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 result.set(i, j, this.get(j, i));
@@ -221,7 +227,7 @@ var Matrix3 = class {
     }
 
     to2dArray() {
-        var array = [];
+        const array = [];
         for (var i = 0; i < 3; i++) {
             array.push(this.elements.slice(i * 3, i * 3 + 3));
         }
@@ -229,7 +235,7 @@ var Matrix3 = class {
     }
 
     toString() {
-        var fixedNumber = 8;
+        const fixedNumber = 8;
         return `${this.elements[0].toFixed(fixedNumber)} ${this.elements[1].toFixed(fixedNumber)} ${this.elements[2].toFixed(fixedNumber)}
 ${this.elements[3].toFixed(fixedNumber)} ${this.elements[4].toFixed(fixedNumber)} ${this.elements[5].toFixed(fixedNumber)}
 ${this.elements[6].toFixed(fixedNumber)} ${this.elements[7].toFixed(fixedNumber)} ${this.elements[8].toFixed(fixedNumber)}`

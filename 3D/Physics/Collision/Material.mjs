@@ -1,5 +1,5 @@
 
-var Material = class {
+const Material = class {
     constructor(options) {
         this.restitution = options?.restitution ?? 0;
         this.friction = options?.friction ?? 0;

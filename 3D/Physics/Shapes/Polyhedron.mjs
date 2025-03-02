@@ -6,7 +6,7 @@ import Quaternion from "../Math3D/Quaternion.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
 
-var Polyhedron = class extends Composite {
+const Polyhedron = class extends Composite {
     static name = "POLYHEDRON";
     constructor(options) {
         super(options);

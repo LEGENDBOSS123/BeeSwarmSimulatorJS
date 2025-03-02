@@ -197,8 +197,8 @@ for (var i = 0; i < 1; i++) {
                 //poly.global.body.setPosition(new Vector3(Math.random() * 6 * s - 3 * s, 0, Math.random() * 6 * s - 3 * s));
                 poly.setRestitution(0);
                 poly.setFriction(0);
-                poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
-                poly.addToScene(graphicsEngine.scene);
+                // poly.mesh = graphicsEngine.meshLinker.createMeshData(child);
+                // poly.addToScene(graphicsEngine.scene);
                 //poly.setMeshAndAddToScene({color: Math.floor(Math.random() * 256**3)}, graphicsEngine);
 
                 poly.setLocalFlag(Composite.FLAGS.STATIC, true);
@@ -217,7 +217,7 @@ for (var i = 0; i < 1; i++) {
         player.respawn();
     });
 }
-for (var i = 0; i < 0; i++) {
+for (var i = 0; i < 1; i++) {
     // var composite = new Composite();
     // composite.setLocalFlag(Composite.FLAGS.STATIC, true);
     // top.comp = composite;

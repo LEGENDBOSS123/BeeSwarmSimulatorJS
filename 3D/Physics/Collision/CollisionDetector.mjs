@@ -4,7 +4,7 @@ import Triangle from "../Shapes/Triangle.mjs";
 import Composite from "../Shapes/Composite.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
-var CollisionDetector = class {
+const CollisionDetector = class {
 
     static seperatorCharacter = ":";
 
@@ -432,7 +432,7 @@ var CollisionDetector = class {
             minDistanceSquared = Infinity;
             inside = false;
 
-            var clampedPoint = this.clampPointToAABB(relativePos.copy(), box);
+            const clampedPoint = this.clampPointToAABB(relativePos.copy(), box);
             inside = clampedPoint.equals(relativePos);
 
             if (inside) {
@@ -477,8 +477,8 @@ var CollisionDetector = class {
             return false;
         }
 
-        var closestPoint2 = box.global.body.rotation.multiplyVector3(closestPoint).addInPlace(boxPos);
-        var contact = new CollisionContact();
+        const closestPoint2 = box.global.body.rotation.multiplyVector3(closestPoint).addInPlace(boxPos);
+        const contact = new CollisionContact();
         contact.point = box.translateLocalToWorld(closestPoint);
         contact.normal = spherePos.subtract(closestPoint2).normalizeInPlace();
         if (inside) {
@@ -520,14 +520,14 @@ var CollisionDetector = class {
 
         t = maxT;
 
-        var isColliding = binarySearch(t) < 0;
+        const isColliding = binarySearch(t) < 0;
 
         if (!isColliding) {
             return false;
         }
-        var distanceTo = sphere1.global.body.position.distance(sphere2.global.body.position);
+        const distanceTo = sphere1.global.body.position.distance(sphere2.global.body.position);
 
-        var contact = new CollisionContact();
+        const contact = new CollisionContact();
         contact.normal = sphere1Pos.subtract(sphere2Pos).normalizeInPlace();
         if (contact.normal.magnitudeSquared() == 0) {
             contact.normal = new Vector3(1, 0, 0);
@@ -536,7 +536,7 @@ var CollisionDetector = class {
 
         contact.body1 = sphere1;
         contact.body2 = sphere2;
-        var penetration = sphere1.radius + sphere2.radius - distanceTo;
+        const penetration = sphere1.radius + sphere2.radius - distanceTo;
 
         contact.penetration = contact.normal.scale(penetration);
 

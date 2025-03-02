@@ -1,6 +1,6 @@
 import ClassRegistry from "./ClassRegistry.mjs";
 
-var WorldObject = class {
+const WorldObject = class {
 
     static name = "WORLDOBJECT";
 

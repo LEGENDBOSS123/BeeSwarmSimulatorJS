@@ -1,7 +1,7 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 import Constraint from "./Constraint.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
-var DistanceConstraint = class extends Constraint {
+const DistanceConstraint = class extends Constraint {
     static name = "DISTANCECONSTRAINT";
     constructor(options) {
 

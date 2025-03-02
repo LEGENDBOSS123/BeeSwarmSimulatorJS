@@ -1,7 +1,7 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 import Hitbox3 from "../Broadphase/Hitbox3.mjs";
 
-var OctreeNode = class {
+const OctreeNode = class {
     constructor(boundary, depth = 0, maxDepth = 8, capacity = 4) {
         this.boundary = boundary;
         this.depth = depth;

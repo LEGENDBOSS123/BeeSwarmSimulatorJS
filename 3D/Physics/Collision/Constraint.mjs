@@ -1,7 +1,7 @@
 import WorldObject from "../Core/WorldObject.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
-var Constraint = class extends WorldObject {
+const Constraint = class extends WorldObject {
 
     
     static name = "CONSTRAINT";

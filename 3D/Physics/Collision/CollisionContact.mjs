@@ -1,7 +1,7 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 import Constraint from "./Constraint.mjs";
 
-var CollisionContact = class extends Constraint {
+const CollisionContact = class extends Constraint {
     static name = "COLLISIONCONTACT";
     constructor(options) {
         super(options);
@@ -84,7 +84,6 @@ var CollisionContact = class extends Constraint {
         if (impulse < 0) {
             impulse = 0;
         }
-
 
         var maxFriction = tangential.magnitude() / this.denominatorFric;
         var friction = impulse * this.material.friction;

@@ -1,4 +1,4 @@
-var Vector3 = class {
+const Vector3 = class {
     constructor(x = 0, y = 0, z = 0) {
         this.x = x;
         this.y = y;
@@ -89,8 +89,8 @@ var Vector3 = class {
     }
 
     applyAxisAngle(axis, angle) {
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
         return this.scale(cos).add(axis.cross(this).scale(sin)).add(axis.scale(axis.dot(this) * (1 - cos)));
     }
 
@@ -99,14 +99,14 @@ var Vector3 = class {
     }
 
     rotateX(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
         return new this.constructor(this.x, this.y * cos - this.z * sin, this.y * sin + this.z * cos);
     }
 
     rotateZ(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
         return new this.constructor(this.x * cos - this.y * sin, this.x * sin + this.y * cos, this.z);
     }
 
@@ -130,21 +130,21 @@ var Vector3 = class {
 
 
     rotateYInPlace(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        var prevX = this.x;
+        const prevX = this.x;
         this.x = this.x * cos - this.z * sin;
         this.z = prevX * sin + this.z * cos;
         return this;
     }
 
     rotateXInPlace(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        var prevY = this.y;
+        const prevY = this.y;
         this.y = this.y * cos - this.z * sin;
         this.z = prevY * sin + this.z * cos;
         return this;
     }
 
     rotateZInPlace(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        var prevX = this.x;
+        const prevX = this.x;
         this.x = this.x * cos - this.y * sin;
         this.y = prevX * sin + this.y * cos;
         return this;
@@ -176,7 +176,7 @@ var Vector3 = class {
     }
 
     normalize() {
-        var mag = this.magnitude();
+        const mag = this.magnitude();
         if (mag == 0) {
             return this;
         }
@@ -184,7 +184,7 @@ var Vector3 = class {
     }
 
     normalizeInPlace() {
-        var mag = this.magnitude();
+        const mag = this.magnitude();
         if (mag == 0) {
             return this;
         }

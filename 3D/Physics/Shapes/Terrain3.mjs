@@ -4,7 +4,7 @@ import Matrix3 from "../Math3D/Matrix3.mjs";
 import Triangle from "./Triangle.mjs";
 import ClassRegistry from "../Core/ClassRegistry.mjs";
 
-var Terrain3 = class extends Composite {
+const Terrain3 = class extends Composite {
     static name = "TERRAIN3";
     constructor(options) {
         super(options);

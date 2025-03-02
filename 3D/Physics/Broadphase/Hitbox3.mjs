@@ -1,6 +1,6 @@
 import Vector3 from "../Math3D/Vector3.mjs";
 
-var Hitbox3 = class {
+const Hitbox3 = class {
     constructor(min = new Vector3(), max = new Vector3()) {
         this.min = min;
         this.max = max;

@@ -1,4 +1,4 @@
-var Keysheld = class {
+const Keysheld = class {
 
     constructor(element) {
         this.keysheld = {};
