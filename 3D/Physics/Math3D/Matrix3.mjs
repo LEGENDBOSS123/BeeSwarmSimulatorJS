@@ -73,7 +73,7 @@ var Matrix3 = class {
     }
 
     multiply(m2) {
-        const m = m.elements;
+        const m = m2.elements;
         const result = new this.constructor();
         result.elements = [
             this.elements[0] * m[0] + this.elements[3] * m[1] + this.elements[6] * m[2],

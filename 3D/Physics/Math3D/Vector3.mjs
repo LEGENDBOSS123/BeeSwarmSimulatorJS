@@ -99,14 +99,10 @@ const Vector3 = class {
     }
 
     rotateX(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        const cos = Math.cos(angle);
-        const sin = Math.sin(angle);
         return new this.constructor(this.x, this.y * cos - this.z * sin, this.y * sin + this.z * cos);
     }
 
     rotateZ(angle, sin = Math.sin(angle), cos = Math.cos(angle)) {
-        const cos = Math.cos(angle);
-        const sin = Math.sin(angle);
         return new this.constructor(this.x * cos - this.y * sin, this.x * sin + this.y * cos, this.z);
     }
 
